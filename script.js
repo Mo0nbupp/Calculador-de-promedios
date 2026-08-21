@@ -2993,3 +2993,144 @@ document.addEventListener(
 
     }
 );
+/* =========================================================
+   MENÚ
+========================================================= */
+
+function abrirMenu() {
+
+    document
+        .getElementById("menu-lateral")
+        .classList.add("abierto");
+
+    document
+        .getElementById("fondo-menu")
+        .classList.add("activo");
+
+}
+
+
+function cerrarMenu() {
+
+    document
+        .getElementById("menu-lateral")
+        .classList.remove("abierto");
+
+    document
+        .getElementById("fondo-menu")
+        .classList.remove("activo");
+
+}
+
+
+function irDesdeMenu(pantalla) {
+
+    cerrarMenu();
+
+    mostrarPantalla(pantalla);
+
+}
+
+
+/* =========================================================
+   TEMAS
+========================================================= */
+
+function cambiarTema(tema) {
+
+    document.body.dataset.tema = tema;
+
+    localStorage.setItem(
+        "temaCalculadora",
+        tema
+    );
+
+}
+
+
+function cargarTema() {
+
+    const tema =
+        localStorage.getItem(
+            "temaCalculadora"
+        ) || "lila";
+
+
+    document.body.dataset.tema =
+        tema;
+
+}
+
+
+/* =========================================================
+   SUGERENCIAS
+========================================================= */
+
+function enviarSugerencia() {
+
+    const tipo =
+        document.getElementById(
+            "tipo-sugerencia"
+        ).value;
+
+    const ramo =
+        document.getElementById(
+            "ramo-sugerencia"
+        ).value.trim();
+
+    const mensaje =
+        document.getElementById(
+            "mensaje-sugerencia"
+        ).value.trim();
+
+
+    if (!tipo || !mensaje) {
+
+        alert(
+            "Completa el tipo de sugerencia y el mensaje."
+        );
+
+        return;
+
+    }
+
+
+    /*
+        Por ahora dejamos la función preparada.
+        Más adelante podemos conectarla con
+        Supabase o el sistema que decidamos.
+    */
+
+
+    alert(
+        "¡Gracias por tu sugerencia!"
+    );
+
+
+    document.getElementById(
+        "tipo-sugerencia"
+    ).value = "";
+
+    document.getElementById(
+        "ramo-sugerencia"
+    ).value = "";
+
+    document.getElementById(
+        "mensaje-sugerencia"
+    ).value = "";
+
+}
+
+
+/* =========================================================
+   INICIO DEL MENÚ
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        cargarTema();
+
+    }
+);
