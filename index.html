@@ -14,7 +14,7 @@
 <body>
 
     <!-- =====================================================
-         MENÚ
+         BOTÓN DEL MENÚ
     ====================================================== -->
 
     <button
@@ -27,12 +27,20 @@
     </button>
 
 
+    <!-- =====================================================
+         FONDO DEL MENÚ
+    ====================================================== -->
+
     <div
         id="fondo-menu"
         class="fondo-menu"
         onclick="cerrarMenu()"
     ></div>
 
+
+    <!-- =====================================================
+         MENÚ LATERAL
+    ====================================================== -->
 
     <aside
         id="menu-lateral"
@@ -60,7 +68,9 @@
 
                 <span>⌂</span>
 
-                Mis ramos
+                <span class="texto-menu">
+                    Mis ramos
+                </span>
 
             </button>
 
@@ -69,7 +79,9 @@
 
                 <span>?</span>
 
-                Cómo funciona
+                <span class="texto-menu">
+                    Cómo funciona
+                </span>
 
             </button>
 
@@ -78,7 +90,9 @@
 
                 <span>✦</span>
 
-                Sugerencias
+                <span class="texto-menu">
+                    Sugerencias
+                </span>
 
             </button>
 
@@ -87,7 +101,9 @@
 
                 <span>◐</span>
 
-                Temas
+                <span class="texto-menu">
+                    Temas
+                </span>
 
             </button>
 
@@ -96,7 +112,9 @@
 
                 <span>▣</span>
 
-                Versión
+                <span class="texto-menu">
+                    Versión
+                </span>
 
             </button>
 
@@ -104,9 +122,7 @@
 
 
         <div class="menu-version">
-
             v1.0
-
         </div>
 
     </aside>
@@ -120,9 +136,9 @@
     <main class="app">
 
 
-        <!-- =========================
+        <!-- =================================================
              INICIO / MIS RAMOS
-        ========================== -->
+        ================================================== -->
 
         <section
             id="pantalla-inicio"
@@ -178,333 +194,9 @@
 
 
 
-        <!-- =========================
-             CÓMO FUNCIONA
-        ========================== -->
-
-        <section
-            id="pantalla-como-funciona"
-            class="pantalla"
-        >
-
-            <div class="barra-superior">
-
-                <button onclick="volverMisRamos()">
-                    ← Mis ramos
-                </button>
-
-            </div>
-
-
-            <div class="contenido">
-
-                <h1>Cómo funciona</h1>
-
-                <p class="descripcion">
-                    Conoce cómo utilizar la calculadora de promedios.
-                </p>
-
-
-                <div class="tarjeta">
-
-                    <h2>1. Agrega tu ramo</h2>
-
-                    <p>
-                        Crea un nuevo ramo e indica si tiene laboratorio.
-                    </p>
-
-                </div>
-
-
-                <div class="tarjeta">
-
-                    <h2>2. Configura tus evaluaciones</h2>
-
-                    <p>
-                        Agrega tus evaluaciones, sus notas y ponderaciones.
-                    </p>
-
-                </div>
-
-
-                <div class="tarjeta">
-
-                    <h2>3. Revisa tu promedio</h2>
-
-                    <p>
-                        La calculadora actualizará tu promedio según las notas ingresadas.
-                    </p>
-
-                </div>
-
-
-                <div class="tarjeta">
-
-                    <h2>4. Calcula lo que necesitas</h2>
-
-                    <p>
-                        Puedes revisar qué nota necesitas para alcanzar tu objetivo.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =========================
-             SUGERENCIAS
-        ========================== -->
-
-        <section
-            id="pantalla-sugerencias"
-            class="pantalla"
-        >
-
-            <div class="barra-superior">
-
-                <button onclick="volverMisRamos()">
-                    ← Mis ramos
-                </button>
-
-            </div>
-
-
-            <div class="contenido">
-
-                <h1>Sugerencias</h1>
-
-                <p class="descripcion">
-                    ¿Tienes una idea para mejorar la calculadora?
-                </p>
-
-
-                <div class="tarjeta">
-
-                    <label for="tipo-sugerencia">
-                        Tipo de sugerencia
-                    </label>
-
-                    <select id="tipo-sugerencia">
-
-                        <option value="">
-                            Selecciona una opción
-                        </option>
-
-                        <option value="funcion">
-                            Nueva función
-                        </option>
-
-                        <option value="diseño">
-                            Diseño
-                        </option>
-
-                        <option value="error">
-                            Reportar un error
-                        </option>
-
-                        <option value="otro">
-                            Otro
-                        </option>
-
-                    </select>
-
-
-                    <label for="ramo-sugerencia">
-                        Ramo
-                    </label>
-
-                    <input
-                        type="text"
-                        id="ramo-sugerencia"
-                        placeholder="Ej: Cálculo II"
-                    >
-
-
-                    <label for="mensaje-sugerencia">
-                        Mensaje
-                    </label>
-
-                    <textarea
-                        id="mensaje-sugerencia"
-                        placeholder="Cuéntanos tu sugerencia..."
-                    ></textarea>
-
-
-                    <button
-                        class="boton-principal"
-                        onclick="enviarSugerencia()"
-                    >
-                        Enviar sugerencia
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =========================
-             TEMAS
-        ========================== -->
-
-        <section
-            id="pantalla-temas"
-            class="pantalla"
-        >
-
-            <div class="barra-superior">
-
-                <button onclick="volverMisRamos()">
-                    ← Mis ramos
-                </button>
-
-            </div>
-
-
-            <div class="contenido">
-
-                <h1>Temas</h1>
-
-                <p class="descripcion">
-                    Personaliza los colores de la calculadora.
-                </p>
-
-
-                <div class="tarjeta">
-
-                    <h2>Elige un tema</h2>
-
-
-                    <div class="temas">
-
-                        <button
-                            class="tema-opcion"
-                            onclick="cambiarTema('lila')"
-                        >
-
-                            <span class="tema-color lila"></span>
-
-                            Lila
-
-                        </button>
-
-
-                        <button
-                            class="tema-opcion"
-                            onclick="cambiarTema('verde')"
-                        >
-
-                            <span class="tema-color verde"></span>
-
-                            Verde
-
-                        </button>
-
-
-                        <button
-                            class="tema-opcion"
-                            onclick="cambiarTema('celeste')"
-                        >
-
-                            <span class="tema-color celeste"></span>
-
-                            Celeste
-
-                        </button>
-
-
-                        <button
-                            class="tema-opcion"
-                            onclick="cambiarTema('rosa')"
-                        >
-
-                            <span class="tema-color rosa"></span>
-
-                            Rosa
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =========================
-             VERSION
-        ========================== -->
-
-        <section
-            id="pantalla-version"
-            class="pantalla"
-        >
-
-            <div class="barra-superior">
-
-                <button onclick="volverMisRamos()">
-                    ← Mis ramos
-                </button>
-
-            </div>
-
-
-            <div class="contenido">
-
-                <h1>Versión</h1>
-
-                <p class="descripcion">
-                    Historial de cambios de la calculadora.
-                </p>
-
-
-                <div class="historial-versiones">
-
-
-                    <div class="version-item actual">
-
-                        <div class="version-numero">
-                            v1.0
-                        </div>
-
-                        <div class="version-info">
-
-                            <h2>Versión actual</h2>
-
-                            <p>
-                                Primera versión de la calculadora de promedios.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!--
-                    AQUÍ SE PUEDEN AGREGAR FUTURAS VERSIONES
-                    SIGUIENDO EL MISMO FORMATO.
-                    -->
-
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =========================
+        <!-- =================================================
              NUEVO RAMO
-        ========================== -->
+        ================================================== -->
 
         <section
             id="pantalla-nuevo-ramo"
@@ -551,9 +243,9 @@
 
 
 
-        <!-- =========================
+        <!-- =================================================
              LABORATORIO
-        ========================== -->
+        ================================================== -->
 
         <section
             id="pantalla-laboratorio"
@@ -602,9 +294,9 @@
 
 
 
-        <!-- =========================
+        <!-- =================================================
              DIVISIÓN TEORÍA / LAB
-        ========================== -->
+        ================================================== -->
 
         <section
             id="pantalla-division"
@@ -693,9 +385,9 @@
 
 
 
-        <!-- =========================
+        <!-- =================================================
              CONFIGURACIÓN EVALUACIONES
-        ========================== -->
+        ================================================== -->
 
         <section
             id="pantalla-evaluaciones"
@@ -822,9 +514,9 @@
 
 
 
-        <!-- =========================
+        <!-- =================================================
              RESUMEN DEL RAMO
-        ========================== -->
+        ================================================== -->
 
         <section
             id="pantalla-ramo"
@@ -1079,9 +771,9 @@
 
 
 
-        <!-- =========================
+        <!-- =================================================
              MODAL NUEVA EVALUACIÓN
-        ========================== -->
+        ================================================== -->
 
         <div
             id="modal-evaluacion"
@@ -1229,9 +921,9 @@
 
 
 
-        <!-- =========================
+        <!-- =================================================
              MODAL CONFIRMACIÓN SALIDA
-        ========================== -->
+        ================================================== -->
 
         <div
             id="modal-salir"
@@ -1269,13 +961,389 @@
         </div>
 
 
+
+        <!-- =================================================
+             TARJETA FLOTANTE:
+             CÓMO FUNCIONA
+        ================================================== -->
+
+        <div
+            id="panel-como-funciona"
+            class="panel-menu oculto"
+            onclick="cerrarPanelDesdeFondo(event)"
+        >
+
+            <div class="panel-contenido">
+
+                <div class="panel-encabezado">
+
+                    <div>
+
+                        <h2>Cómo funciona</h2>
+
+                        <p>
+                            Aprende a utilizar la calculadora.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        class="panel-cerrar"
+                        onclick="cerrarPanelMenu()"
+                        aria-label="Cerrar"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="panel-tarjeta">
+
+                    <h3>1. Agrega tu ramo</h3>
+
+                    <p>
+                        Crea un nuevo ramo e indica si tiene laboratorio.
+                    </p>
+
+                </div>
+
+
+                <div class="panel-tarjeta">
+
+                    <h3>2. Configura tus evaluaciones</h3>
+
+                    <p>
+                        Agrega tus evaluaciones, sus notas y ponderaciones.
+                    </p>
+
+                </div>
+
+
+                <div class="panel-tarjeta">
+
+                    <h3>3. Revisa tu promedio</h3>
+
+                    <p>
+                        La calculadora actualizará tu promedio según las
+                        notas ingresadas.
+                    </p>
+
+                </div>
+
+
+                <div class="panel-tarjeta">
+
+                    <h3>4. Calcula lo que necesitas</h3>
+
+                    <p>
+                        Puedes revisar qué nota necesitas para alcanzar
+                        tu objetivo.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TARJETA FLOTANTE:
+             SUGERENCIAS
+        ================================================== -->
+
+        <div
+            id="panel-sugerencias"
+            class="panel-menu oculto"
+            onclick="cerrarPanelDesdeFondo(event)"
+        >
+
+            <div class="panel-contenido">
+
+                <div class="panel-encabezado">
+
+                    <div>
+
+                        <h2>Sugerencias</h2>
+
+                        <p>
+                            Ayúdame a mejorar la calculadora.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        class="panel-cerrar"
+                        onclick="cerrarPanelMenu()"
+                        aria-label="Cerrar"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="panel-tarjeta">
+
+                    <label for="tipo-sugerencia">
+                        Tipo de sugerencia
+                    </label>
+
+                    <select id="tipo-sugerencia">
+
+                        <option value="">
+                            Selecciona una opción
+                        </option>
+
+                        <option value="funcion">
+                            Nueva función
+                        </option>
+
+                        <option value="diseño">
+                            Diseño
+                        </option>
+
+                        <option value="error">
+                            Reportar un error
+                        </option>
+
+                        <option value="otro">
+                            Otro
+                        </option>
+
+                    </select>
+
+
+                    <label for="ramo-sugerencia">
+                        Ramo
+                    </label>
+
+                    <input
+                        type="text"
+                        id="ramo-sugerencia"
+                        placeholder="Ej: Cálculo II"
+                    >
+
+
+                    <label for="mensaje-sugerencia">
+                        Mensaje
+                    </label>
+
+                    <textarea
+                        id="mensaje-sugerencia"
+                        placeholder="Cuéntanos tu sugerencia..."
+                    ></textarea>
+
+
+                    <button
+                        class="boton-principal"
+                        onclick="enviarSugerencia()"
+                    >
+                        Enviar sugerencia
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TARJETA FLOTANTE:
+             TEMAS
+        ================================================== -->
+
+        <div
+            id="panel-temas"
+            class="panel-menu oculto"
+            onclick="cerrarPanelDesdeFondo(event)"
+        >
+
+            <div class="panel-contenido">
+
+                <div class="panel-encabezado">
+
+                    <div>
+
+                        <h2>Temas</h2>
+
+                        <p>
+                            Personaliza los colores de la calculadora.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        class="panel-cerrar"
+                        onclick="cerrarPanelMenu()"
+                        aria-label="Cerrar"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="panel-tarjeta">
+
+                    <h3>Elige un tema</h3>
+
+
+                    <div class="temas">
+
+                        <button
+                            class="tema-opcion"
+                            onclick="cambiarTema('lila')"
+                        >
+
+                            <span class="tema-color lila"></span>
+
+                            Lila
+
+                        </button>
+
+
+                        <button
+                            class="tema-opcion"
+                            onclick="cambiarTema('verde')"
+                        >
+
+                            <span class="tema-color verde"></span>
+
+                            Verde
+
+                        </button>
+
+
+                        <button
+                            class="tema-opcion"
+                            onclick="cambiarTema('celeste')"
+                        >
+
+                            <span class="tema-color celeste"></span>
+
+                            Celeste
+
+                        </button>
+
+
+                        <button
+                            class="tema-opcion"
+                            onclick="cambiarTema('rosa')"
+                        >
+
+                            <span class="tema-color rosa"></span>
+
+                            Rosa
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             TARJETA FLOTANTE:
+             VERSIÓN
+        ================================================== -->
+
+        <div
+            id="panel-version"
+            class="panel-menu oculto"
+            onclick="cerrarPanelDesdeFondo(event)"
+        >
+
+            <div class="panel-contenido">
+
+                <div class="panel-encabezado">
+
+                    <div>
+
+                        <h2>Versión</h2>
+
+                        <p>
+                            Historial de cambios de la calculadora.
+                        </p>
+
+                    </div>
+
+
+                    <button
+                        class="panel-cerrar"
+                        onclick="cerrarPanelMenu()"
+                        aria-label="Cerrar"
+                    >
+                        ×
+                    </button>
+
+                </div>
+
+
+                <div class="historial-versiones">
+
+                    <div class="version-item actual">
+
+                        <div class="version-numero">
+                            v1.0
+                        </div>
+
+                        <div class="version-info">
+
+                            <h3>
+                                Versión actual
+                            </h3>
+
+                            <p>
+                                Primera versión de la calculadora
+                                de promedios.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+
+                    <!--
+                    AQUÍ SE PUEDEN AGREGAR FUTURAS VERSIONES.
+                    -->
+
+                </div>
+
+            </div>
+
+        </div>
+
+
     </main>
 
+
+
+    <!-- =====================================================
+         WATERMARK
+    ====================================================== -->
 
     <div class="watermark">
         © Calculadora creada por @Mo0nbupp
     </div>
 
+
+
+    <!-- =====================================================
+         JAVASCRIPT
+    ====================================================== -->
 
     <script src="script.js"></script>
 
