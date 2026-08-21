@@ -3134,3 +3134,118 @@ document.addEventListener(
 
     }
 );
+/* =========================================================
+   TARJETAS DEL MENÚ
+========================================================= */
+
+function abrirTarjetaMenu(idTarjeta) {
+
+    // Cerrar el menú lateral primero
+    cerrarMenu();
+
+    // Ocultar cualquier tarjeta que esté abierta
+    document
+        .querySelectorAll(".tarjeta-menu")
+        .forEach(tarjeta => {
+
+            tarjeta.classList.add("oculto");
+
+        });
+
+
+    // Buscar la tarjeta seleccionada
+    const tarjeta =
+        document.getElementById(idTarjeta);
+
+
+    if (!tarjeta) return;
+
+
+    // Mostrar la tarjeta
+    tarjeta.classList.remove("oculto");
+
+
+    // Activar fondo
+    const fondo =
+        document.getElementById("fondo-tarjeta-menu");
+
+
+    if (fondo) {
+
+        fondo.classList.add("activo");
+
+    }
+
+}
+
+
+/* =========================================================
+   CERRAR TARJETAS
+========================================================= */
+
+function cerrarTarjetaMenu() {
+
+    document
+        .querySelectorAll(".tarjeta-menu")
+        .forEach(tarjeta => {
+
+            tarjeta.classList.add("oculto");
+
+        });
+
+
+    const fondo =
+        document.getElementById(
+            "fondo-tarjeta-menu"
+        );
+
+
+    if (fondo) {
+
+        fondo.classList.remove("activo");
+
+    }
+
+}
+
+
+/* =========================================================
+   CERRAR CON ESC
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    evento => {
+
+        if (evento.key === "Escape") {
+
+            cerrarTarjetaMenu();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INICIO
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        /*
+            Las tarjetas comienzan cerradas.
+        */
+
+        document
+            .querySelectorAll(".tarjeta-menu")
+            .forEach(tarjeta => {
+
+                tarjeta.classList.add("oculto");
+
+            });
+
+    }
+);
