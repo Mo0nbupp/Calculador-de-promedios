@@ -3360,3 +3360,155 @@ document.addEventListener(
 
     }
 );
+/* =========================================================
+   MENÚ LATERAL
+========================================================= */
+
+function abrirMenu() {
+    const menu = document.getElementById("menu-lateral");
+    const fondo = document.getElementById("fondo-menu");
+
+    menu.classList.add("abierto");
+    fondo.classList.add("activo");
+}
+
+
+function cerrarMenu() {
+    const menu = document.getElementById("menu-lateral");
+    const fondo = document.getElementById("fondo-menu");
+
+    menu.classList.remove("abierto");
+    fondo.classList.remove("activo");
+}
+
+
+
+/* =========================================================
+   PANELES DEL MENÚ
+========================================================= */
+
+function cerrarTodosLosPaneles() {
+
+    document
+        .querySelectorAll(".panel-menu")
+        .forEach(panel => {
+
+            panel.classList.add("oculto");
+
+        });
+
+}
+
+
+function abrirPanelMenu(idPanel) {
+
+    cerrarTodosLosPaneles();
+
+    const panel = document.getElementById(idPanel);
+
+    if (!panel) return;
+
+    panel.classList.remove("oculto");
+
+}
+
+
+function cerrarPanelMenu() {
+
+    cerrarTodosLosPaneles();
+
+}
+
+
+
+/* =========================================================
+   OPCIONES DEL MENÚ
+========================================================= */
+
+function irAMisRamos() {
+
+    cerrarMenu();
+
+    cerrarTodosLosPaneles();
+
+    mostrarPantalla("pantalla-inicio");
+
+}
+
+
+function irComoFunciona() {
+
+    cerrarMenu();
+
+    abrirPanelMenu("panel-como-funciona");
+
+}
+
+
+function irSugerencias() {
+
+    cerrarMenu();
+
+    abrirPanelMenu("panel-sugerencias");
+
+}
+
+
+function irTemas() {
+
+    cerrarMenu();
+
+    abrirPanelMenu("panel-temas");
+
+}
+
+
+function irVersion() {
+
+    cerrarMenu();
+
+    abrirPanelMenu("panel-version");
+
+}
+
+
+
+/* =========================================================
+   CERRAR PANEL HACIENDO CLIC EN EL FONDO
+========================================================= */
+
+function cerrarPanelDesdeFondo(event) {
+
+    /*
+       Si el clic fue directamente sobre el fondo,
+       se cierra el panel.
+
+       Si el clic fue dentro de la tarjeta,
+       no hace nada.
+    */
+
+    if (event.target === event.currentTarget) {
+
+        cerrarPanelMenu();
+
+    }
+
+}
+
+
+
+/* =========================================================
+   CERRAR CON ESC
+========================================================= */
+
+document.addEventListener("keydown", function(event) {
+
+    if (event.key === "Escape") {
+
+        cerrarPanelMenu();
+
+        cerrarMenu();
+
+    }
+
+});
