@@ -3140,36 +3140,46 @@ document.addEventListener(
 
 function abrirTarjetaMenu(idTarjeta) {
 
-    // Cerrar el menú lateral primero
-    cerrarMenu();
+    const tarjeta = document.getElementById(idTarjeta);
+    const fondo = document.getElementById("fondo-tarjeta-menu");
 
-    // Ocultar cualquier tarjeta que esté abierta
+    if (!tarjeta) {
+        console.warn("No se encontró la tarjeta:", idTarjeta);
+        return;
+    }
+
+    /*
+        IMPORTANTE:
+        Ya NO cerramos el menú principal.
+        La tarjeta aparece junto al menú.
+    */
+
+    // Cerrar cualquier otra tarjeta
     document
         .querySelectorAll(".tarjeta-menu")
-        .forEach(tarjeta => {
+        .forEach(otraTarjeta => {
 
-            tarjeta.classList.add("oculto");
+            if (otraTarjeta !== tarjeta) {
+                otraTarjeta.classList.remove("tarjeta-visible");
+                otraTarjeta.classList.add("oculto");
+            }
 
         });
 
 
-    // Buscar la tarjeta seleccionada
-    const tarjeta =
-        document.getElementById(idTarjeta);
-
-
-    if (!tarjeta) return;
-
-
-    // Mostrar la tarjeta
+    // Mostrar la tarjeta seleccionada
     tarjeta.classList.remove("oculto");
 
 
-    // Activar fondo
-    const fondo =
-        document.getElementById("fondo-tarjeta-menu");
+    // Pequeño retraso para permitir la animación
+    requestAnimationFrame(() => {
+
+        tarjeta.classList.add("tarjeta-visible");
+
+    });
 
 
+    // Activar fondo si existe
     if (fondo) {
 
         fondo.classList.add("activo");
@@ -3185,13 +3195,16 @@ function abrirTarjetaMenu(idTarjeta) {
 
 function cerrarTarjetaMenu() {
 
-    document
-        .querySelectorAll(".tarjeta-menu")
-        .forEach(tarjeta => {
+    const tarjetas =
+        document.querySelectorAll(".tarjeta-menu");
 
-            tarjeta.classList.add("oculto");
 
-        });
+    tarjetas.forEach(tarjeta => {
+
+        tarjeta.classList.remove("tarjeta-visible");
+        tarjeta.classList.add("oculto");
+
+    });
 
 
     const fondo =
@@ -3210,6 +3223,46 @@ function cerrarTarjetaMenu() {
 
 
 /* =========================================================
+   CERRAR TARJETA AL TOCAR EL FONDO
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const fondo =
+            document.getElementById(
+                "fondo-tarjeta-menu"
+            );
+
+
+        if (fondo) {
+
+            fondo.addEventListener(
+                "click",
+                cerrarTarjetaMenu
+            );
+
+        }
+
+
+        /*
+            Todas las tarjetas parten cerradas.
+        */
+
+        document
+            .querySelectorAll(".tarjeta-menu")
+            .forEach(tarjeta => {
+
+                tarjeta.classList.add("oculto");
+
+            });
+
+    }
+);
+
+
+/* =========================================================
    CERRAR CON ESC
 ========================================================= */
 
@@ -3225,7 +3278,6 @@ document.addEventListener(
 
     }
 );
-
 
 /* =========================================================
    INICIO
