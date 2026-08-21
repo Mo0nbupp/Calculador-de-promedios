@@ -3249,3 +3249,114 @@ document.addEventListener(
 
     }
 );
+/* =========================================================
+   TARJETAS DEL MENÚ
+========================================================= */
+
+function abrirTarjetaMenu(idTarjeta) {
+
+    cerrarMenu();
+
+    document
+        .querySelectorAll(".tarjeta-menu")
+        .forEach(tarjeta => {
+            tarjeta.classList.add("oculto");
+        });
+
+
+    const tarjeta =
+        document.getElementById(idTarjeta);
+
+
+    const fondo =
+        document.getElementById(
+            "fondo-tarjeta-menu"
+        );
+
+
+    if (!tarjeta) {
+        console.warn(
+            "No se encontró la tarjeta:",
+            idTarjeta
+        );
+        return;
+    }
+
+
+    tarjeta.classList.remove("oculto");
+
+
+    if (fondo) {
+        fondo.classList.add("activo");
+    }
+
+}
+
+
+function cerrarTarjetaMenu() {
+
+    document
+        .querySelectorAll(".tarjeta-menu")
+        .forEach(tarjeta => {
+            tarjeta.classList.add("oculto");
+        });
+
+
+    const fondo =
+        document.getElementById(
+            "fondo-tarjeta-menu"
+        );
+
+
+    if (fondo) {
+        fondo.classList.remove("activo");
+    }
+
+}
+
+
+/* =========================================================
+   CERRAR TARJETA AL TOCAR EL FONDO
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        const fondo =
+            document.getElementById(
+                "fondo-tarjeta-menu"
+            );
+
+
+        if (fondo) {
+
+            fondo.addEventListener(
+                "click",
+                cerrarTarjetaMenu
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   CERRAR CON ESC
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    evento => {
+
+        if (
+            evento.key === "Escape"
+        ) {
+
+            cerrarTarjetaMenu();
+
+        }
+
+    }
+);
