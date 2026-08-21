@@ -12,7 +12,98 @@
 </head>
 
 <body>
+<!-- =========================
+     MENÚ PRINCIPAL
+========================== -->
 
+<button
+    id="boton-menu"
+    class="boton-menu"
+    onclick="abrirMenu()"
+    aria-label="Abrir menú"
+>
+    ☰
+</button>
+
+
+<div
+    id="menu-lateral"
+    class="menu-lateral"
+>
+
+    <div class="menu-encabezado">
+
+        <h2>Calculadora de Promedios</h2>
+
+        <button
+            class="cerrar-menu"
+            onclick="cerrarMenu()"
+            aria-label="Cerrar menú"
+        >
+            ×
+        </button>
+
+    </div>
+
+
+    <nav class="menu-navegacion">
+
+        <button
+            onclick="irDesdeMenu('pantalla-inicio')"
+        >
+            <span>⌂</span>
+            Mis ramos
+        </button>
+
+
+        <button
+            onclick="irDesdeMenu('pantalla-como-funciona')"
+        >
+            <span>?</span>
+            Cómo funciona
+        </button>
+
+
+        <button
+            onclick="irDesdeMenu('pantalla-sugerencias')"
+        >
+            <span>✎</span>
+            Sugerencias
+        </button>
+
+
+        <button
+            onclick="irDesdeMenu('pantalla-temas')"
+        >
+            <span>◐</span>
+            Temas
+        </button>
+
+
+        <button
+            onclick="irDesdeMenu('pantalla-version')"
+        >
+            <span>⌘</span>
+            Versión
+        </button>
+
+    </nav>
+
+
+    <div class="menu-version">
+
+        v1.0
+
+    </div>
+
+</div>
+
+
+<div
+    id="fondo-menu"
+    class="fondo-menu"
+    onclick="cerrarMenu()"
+></div>
     <main class="app">
 
         <!-- =========================
@@ -68,7 +159,276 @@
 
         </section>
 
+         <!-- =========================
+     CÓMO FUNCIONA
+========================== -->
 
+<section
+    id="pantalla-como-funciona"
+    class="pantalla"
+>
+
+    <div class="contenido">
+
+        <h1>Cómo funciona</h1>
+
+        <p class="descripcion">
+            Aprende cómo utilizar la calculadora de promedios.
+        </p>
+
+
+        <div class="tarjeta">
+
+            <h2>Agregar un ramo</h2>
+
+            <p>
+                Agrega un ramo y configura la forma en que se evalúa.
+            </p>
+
+        </div>
+
+
+        <div class="tarjeta">
+
+            <h2>Ingresa tus evaluaciones</h2>
+
+            <p>
+                Registra tus notas, ponderaciones y evaluaciones pendientes.
+            </p>
+
+        </div>
+
+
+        <div class="tarjeta">
+
+            <h2>Calcula tu promedio</h2>
+
+            <p>
+                La calculadora actualizará automáticamente tu promedio.
+            </p>
+
+        </div>
+
+
+        <div class="tarjeta">
+
+            <h2>Calcula lo que necesitas</h2>
+
+            <p>
+                Revisa qué nota necesitas para alcanzar tu objetivo.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     SUGERENCIAS
+========================== -->
+
+<section
+    id="pantalla-sugerencias"
+    class="pantalla"
+>
+
+    <div class="contenido">
+
+        <h1>Sugerencias</h1>
+
+        <p class="descripcion">
+            ¿Tienes alguna idea para mejorar la calculadora?
+        </p>
+
+
+        <div class="tarjeta">
+
+            <label for="tipo-sugerencia">
+                Tipo de sugerencia
+            </label>
+
+            <select id="tipo-sugerencia">
+
+                <option value="">
+                    Selecciona una opción
+                </option>
+
+                <option value="funcion">
+                    Nueva función
+                </option>
+
+                <option value="diseño">
+                    Diseño
+                </option>
+
+                <option value="error">
+                    Reportar un error
+                </option>
+
+                <option value="otro">
+                    Otro
+                </option>
+
+            </select>
+
+
+            <label for="ramo-sugerencia">
+                Ramo
+            </label>
+
+            <input
+                type="text"
+                id="ramo-sugerencia"
+                placeholder="Ej: Cálculo II"
+            >
+
+
+            <label for="mensaje-sugerencia">
+                Mensaje
+            </label>
+
+            <textarea
+                id="mensaje-sugerencia"
+                placeholder="Cuéntanos tu sugerencia..."
+                rows="5"
+            ></textarea>
+
+
+            <button
+                class="boton-principal"
+                onclick="enviarSugerencia()"
+            >
+                Enviar sugerencia
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     TEMAS
+========================== -->
+
+<section
+    id="pantalla-temas"
+    class="pantalla"
+>
+
+    <div class="contenido">
+
+        <h1>Temas</h1>
+
+        <p class="descripcion">
+            Personaliza la apariencia de la calculadora.
+        </p>
+
+
+        <div class="tarjeta temas">
+
+            <button
+                class="tema-opcion"
+                data-tema="lila"
+                onclick="cambiarTema('lila')"
+            >
+                <span class="tema-color lila"></span>
+                Lila
+            </button>
+
+
+            <button
+                class="tema-opcion"
+                data-tema="verde"
+                onclick="cambiarTema('verde')"
+            >
+                <span class="tema-color verde"></span>
+                Verde
+            </button>
+
+
+            <button
+                class="tema-opcion"
+                data-tema="celeste"
+                onclick="cambiarTema('celeste')"
+            >
+                <span class="tema-color celeste"></span>
+                Celeste
+            </button>
+
+
+            <button
+                class="tema-opcion"
+                data-tema="rosa"
+                onclick="cambiarTema('rosa')"
+            >
+                <span class="tema-color rosa"></span>
+                Rosa pastel
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================
+     VERSIÓN
+========================== -->
+
+<section
+    id="pantalla-version"
+    class="pantalla"
+>
+
+    <div class="contenido">
+
+        <h1>Versión</h1>
+
+        <p class="descripcion">
+            Historial de versiones de la calculadora.
+        </p>
+
+
+        <div class="historial-versiones">
+
+
+            <div class="version-item actual">
+
+                <div class="version-numero">
+                    v1.0
+                </div>
+
+                <div class="version-info">
+
+                    <h2>
+                        Versión inicial
+                    </h2>
+
+                    <p>
+                        Primera versión de la Calculadora de Promedios.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!--
+            Las siguientes versiones se pueden
+            agregar de la misma forma que en la malla.
+            -->
+
+        </div>
+
+    </div>
+
+</section>
+        
         <!-- =========================
              NUEVO RAMO
         ========================== -->
