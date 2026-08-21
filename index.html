@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,156 +12,803 @@
 
 <body>
 
-    <main class="contenedor">
+    <main class="app">
 
-        <section id="inicio" class="pantalla activa">
+        <!-- =========================
+             INICIO / MIS RAMOS
+        ========================== -->
 
-            <h1>Calculadora de Promedios 🎓</h1>
+        <section id="pantalla-inicio" class="pantalla activa">
 
-            <p>
-                Configuremos tu ramo para calcular tu promedio
-                y descubrir qué notas necesitas.
-            </p>
+            <header class="encabezado-principal">
 
-            <div class="tarjeta">
+                <h1>Calculadora de Promedios</h1>
 
-                <h2>Primero, cuéntanos...</h2>
+                <p>
+                    Organiza tus notas, calcula tu promedio y salva el ramo.
+                </p>
 
-                <p>¿El ramo tiene laboratorio?</p>
+            </header>
 
-                <div class="botones">
 
-                    <button onclick="elegirLaboratorio(true)">
-                        🧪 Sí, tiene laboratorio
-                    </button>
+            <section class="seccion-ramos">
 
-                    <button onclick="elegirLaboratorio(false)">
-                        📚 No tiene laboratorio
+                <div class="titulo-seccion">
+
+                    <h2>Mis ramos</h2>
+
+                    <button
+                        class="boton-agregar"
+                        onclick="nuevoRamo()"
+                    >
+                        + Agregar ramo
                     </button>
 
                 </div>
 
-            </div>
+
+                <div id="lista-ramos">
+
+                    <div class="sin-ramos">
+
+                        <p>
+                            Todavía no tienes ramos guardados.
+                        </p>
+
+                        <span>
+                            Agrega tu primer ramo para comenzar.
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </section>
 
         </section>
 
 
-        <section id="configuracion" class="pantalla">
+        <!-- =========================
+             NUEVO RAMO
+        ========================== -->
 
-            <h1>Configuremos tu ramo ✏️</h1>
+        <section id="pantalla-nuevo-ramo" class="pantalla">
 
-            <div class="tarjeta">
+            <div class="barra-superior">
 
-                <label for="nombreRamo">
-                    Nombre del ramo
-                </label>
-
-                <input
-                    type="text"
-                    id="nombreRamo"
-                    placeholder="Ej: Cálculo II"
-                >
-
-            </div>
-
-
-            <div class="tarjeta">
-
-                <h2>¿Cómo se calcula la nota?</h2>
-
-                <p>
-                    Agrega las evaluaciones que forman parte de tu ramo.
-                </p>
-
-                <div id="evaluaciones"></div>
-
-                <button
-                    class="boton-secundario"
-                    onclick="agregarEvaluacion()"
-                >
-                    + Agregar evaluación
+                <button onclick="volverMisRamos()">
+                    ← Mis ramos
                 </button>
 
             </div>
 
 
-            <div class="tarjeta">
+            <div class="contenido-centrado">
 
-                <h2>Nota mínima para aprobar</h2>
+                <h1>Nuevo ramo</h1>
+
+                <div class="tarjeta">
+
+                    <label for="nombre-nuevo-ramo">
+                        ¿Cómo se llama tu ramo?
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nombre-nuevo-ramo"
+                        placeholder="Ej: Cálculo II"
+                    >
+
+                    <button
+                        class="boton-principal"
+                        onclick="guardarNombreRamo()"
+                    >
+                        Continuar →
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             LABORATORIO
+        ========================== -->
+
+        <section id="pantalla-laboratorio" class="pantalla">
+
+            <div class="barra-superior">
+
+                <button onclick="volverNuevoRamo()">
+                    ← Atrás
+                </button>
+
+            </div>
+
+
+            <div class="contenido-centrado">
+
+                <h1>Comencemos con lo básico</h1>
+
+                <p class="descripcion">
+                    ¿Tu ramo tiene laboratorio?
+                </p>
+
+
+                <div class="opciones">
+
+                    <button
+                        class="opcion"
+                        onclick="seleccionarLaboratorio(true)"
+                    >
+                        Sí, tiene laboratorio
+                    </button>
+
+                    <button
+                        class="opcion"
+                        onclick="seleccionarLaboratorio(false)"
+                    >
+                        No, tiene laboratorio
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             DIVISIÓN TEORÍA / LAB
+        ========================== -->
+
+        <section id="pantalla-division" class="pantalla">
+
+            <div class="barra-superior">
+
+                <button onclick="volverLaboratorio()">
+                    ← Atrás
+                </button>
+
+            </div>
+
+
+            <div class="contenido-centrado">
+
+                <h1>¿Cómo se divide la nota del ramo?</h1>
+
+                <div class="tarjeta">
+
+                    <div class="campo-porcentaje">
+
+                        <label>
+                            Teoría
+                        </label>
+
+                        <div class="campo-con-unidad">
+
+                            <input
+                                type="number"
+                                id="porcentaje-teoria"
+                                placeholder="70"
+                                min="0"
+                                max="100"
+                            >
+
+                            <span>%</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="campo-porcentaje">
+
+                        <label>
+                            Laboratorio
+                        </label>
+
+                        <div class="campo-con-unidad">
+
+                            <input
+                                type="number"
+                                id="porcentaje-laboratorio"
+                                placeholder="30"
+                                min="0"
+                                max="100"
+                            >
+
+                            <span>%</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div id="mensaje-division" class="mensaje-validacion"></div>
+
+
+                    <button
+                        class="boton-principal"
+                        onclick="guardarDivision()"
+                    >
+                        Continuar →
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             CONFIGURACIÓN EVALUACIONES
+        ========================== -->
+
+        <section id="pantalla-evaluaciones" class="pantalla">
+
+            <div class="barra-superior">
+
+                <button onclick="volverAnteriorConfiguracion()">
+                    ← Atrás
+                </button>
+
+            </div>
+
+
+            <div class="contenido">
+
+                <h1>¿Cómo se evalúa tu ramo?</h1>
+
+                <p class="descripcion">
+                    Agrega las evaluaciones que forman parte de tu ramo
+                    y señala cuánto vale cada una.
+                </p>
+
+
+                <!-- SIN LABORATORIO -->
+
+                <div
+                    id="bloque-evaluaciones"
+                    class="bloque-evaluaciones"
+                >
+
+                    <h2>Evaluaciones</h2>
+
+                    <div id="lista-evaluaciones"></div>
+
+                    <button
+                        class="boton-secundario"
+                        onclick="agregarEvaluacion()"
+                    >
+                        + Agregar evaluación
+                    </button>
+
+                    <div
+                        id="total-ponderaciones"
+                        class="mensaje-validacion"
+                    ></div>
+
+                </div>
+
+
+                <!-- CON LABORATORIO -->
+
+                <div
+                    id="bloque-teoria"
+                    class="bloque-evaluaciones oculto"
+                >
+
+                    <h2>Evaluaciones de teoría</h2>
+
+                    <div id="lista-teoria"></div>
+
+                    <button
+                        class="boton-secundario"
+                        onclick="agregarEvaluacion('teoria')"
+                    >
+                        + Agregar evaluación
+                    </button>
+
+                    <div
+                        id="total-teoria"
+                        class="mensaje-validacion"
+                    ></div>
+
+                </div>
+
+
+                <div
+                    id="bloque-laboratorio"
+                    class="bloque-evaluaciones oculto"
+                >
+
+                    <h2>Evaluaciones de laboratorio</h2>
+
+                    <div id="lista-laboratorio"></div>
+
+                    <button
+                        class="boton-secundario"
+                        onclick="agregarEvaluacion('laboratorio')"
+                    >
+                        + Agregar evaluación
+                    </button>
+
+                    <div
+                        id="total-laboratorio"
+                        class="mensaje-validacion"
+                    ></div>
+
+                </div>
+
+
+                <!-- NOTA MÍNIMA -->
+
+                <div class="tarjeta">
+
+                    <h2>¿Cuál es la nota mínima para aprobar?</h2>
+
+                    <input
+                        type="number"
+                        id="nota-minima"
+                        placeholder="4,0"
+                        min="1"
+                        max="7"
+                        step="0.1"
+                    >
+
+                </div>
+
+
+                <button
+                    class="boton-principal"
+                    onclick="guardarConfiguracion()"
+                >
+                    Guardar ramo
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             RESUMEN DEL RAMO
+        ========================== -->
+
+        <section id="pantalla-ramo" class="pantalla">
+
+            <div class="barra-superior">
+
+                <button onclick="volverMisRamos()">
+                    ← Mis ramos
+                </button>
+
+                <button onclick="editarRamo()">
+                    Editar ramo
+                </button>
+
+            </div>
+
+
+            <div class="contenido">
+
+                <h1 id="titulo-ramo"></h1>
+
+
+                <!-- PROMEDIO -->
+
+                <div class="tarjeta resultado-principal">
+
+                    <h2>Tu promedio actual</h2>
+
+                    <div
+                        id="promedio-actual"
+                        class="promedio-grande"
+                    >
+                        —
+                    </div>
+
+                    <p id="estado-ramo"></p>
+
+                </div>
+
+
+                <!-- EVALUACIONES -->
+
+                <div class="tarjeta">
+
+                    <h2>Evaluaciones</h2>
+
+                    <div id="resumen-evaluaciones"></div>
+
+                </div>
+
+
+                <!-- APROBAR -->
+
+                <div class="tarjeta">
+
+                    <h2>¿Qué necesitas para aprobar?</h2>
+
+                    <div id="resultado-aprobar"></div>
+
+                </div>
+
+
+                <!-- OBJETIVO -->
+
+                <div class="tarjeta">
+
+                    <h2>Elige tu objetivo</h2>
+
+                    <div class="opciones-radio">
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="objetivo"
+                                value="minimo"
+                                checked
+                                onchange="cambiarObjetivo()"
+                            >
+                            Promedio mínimo para aprobar
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="objetivo"
+                                value="otro"
+                                onchange="cambiarObjetivo()"
+                            >
+                            Otro promedio
+                        </label>
+
+                    </div>
+
+
+                    <div
+                        id="campo-otro-objetivo"
+                        class="oculto"
+                    >
+
+                        <label for="otro-objetivo">
+                            ¿Qué promedio quieres alcanzar?
+                        </label>
+
+                        <input
+                            type="number"
+                            id="otro-objetivo"
+                            placeholder="Ej: 5,0"
+                            min="1"
+                            max="7"
+                            step="0.1"
+                            onchange="calcularObjetivo()"
+                        >
+
+                    </div>
+
+
+                    <div id="resultado-objetivo"></div>
+
+                </div>
+
+
+                <!-- PAR -->
+
+                <div
+                    id="bloque-par"
+                    class="tarjeta"
+                >
+
+                    <h2>¿Tienes opción de PAR?</h2>
+
+                    <div class="opciones-radio">
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="tiene-par"
+                                value="si"
+                                onchange="mostrarPAR(true)"
+                            >
+                            Sí
+                        </label>
+
+                        <label>
+                            <input
+                                type="radio"
+                                name="tiene-par"
+                                value="no"
+                                onchange="mostrarPAR(false)"
+                            >
+                            No
+                        </label>
+
+                    </div>
+
+
+                    <div
+                        id="contenido-par"
+                        class="oculto"
+                    >
+
+                        <p>
+                            Elige la nota que quieres reemplazar
+                            y calcula qué necesitas obtener en la PAR.
+                        </p>
+
+                        <div id="notas-reemplazables"></div>
+
+                        <div id="resultado-par"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- EXAMEN -->
+
+                <div
+                    id="bloque-examen"
+                    class="tarjeta"
+                >
+
+                    <h2>¿Y si tienes que dar examen?</h2>
+
+                    <div class="examen-configuracion">
+
+                        <div>
+
+                            <label>
+                                Nota de presentación
+                            </label>
+
+                            <input
+                                type="number"
+                                id="porcentaje-presentacion"
+                                placeholder="70"
+                                min="0"
+                                max="100"
+                            >
+
+                            <span>%</span>
+
+                        </div>
+
+
+                        <div>
+
+                            <label>
+                                Examen
+                            </label>
+
+                            <input
+                                type="number"
+                                id="porcentaje-examen"
+                                placeholder="30"
+                                min="0"
+                                max="100"
+                            >
+
+                            <span>%</span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        id="resultado-examen"
+                        class="resultado-examen"
+                    ></div>
+
+                </div>
+
+
+                <!-- ELIMINAR -->
+
+                <div class="zona-peligro">
+
+                    <button
+                        class="boton-eliminar"
+                        onclick="confirmarEliminarRamo()"
+                    >
+                        Eliminar ramo
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             MODAL NUEVA EVALUACIÓN
+        ========================== -->
+
+        <div
+            id="modal-evaluacion"
+            class="modal oculto"
+        >
+
+            <div class="modal-contenido">
+
+                <h2>Nueva evaluación</h2>
+
+
+                <label>
+                    Nombre de la evaluación
+                </label>
+
+                <input
+                    type="text"
+                    id="nombre-evaluacion"
+                    placeholder="Ej: Prueba 1"
+                >
+
+
+                <label>
+                    Nota
+                </label>
 
                 <input
                     type="number"
-                    id="notaMinima"
-                    value="4"
+                    id="nota-evaluacion"
+                    placeholder="Ej: 5,5"
                     min="1"
                     max="7"
                     step="0.1"
                 >
 
-            </div>
+
+                <label class="checkbox">
+
+                    <input
+                        type="checkbox"
+                        id="nota-pendiente"
+                        onchange="cambiarEstadoNota()"
+                    >
+
+                    Aún no tengo esta nota
+
+                </label>
 
 
-            <button
-                class="boton-principal"
-                onclick="continuarResultados()"
-            >
-                Continuar →
-            </button>
+                <label>
+                    Ponderación (%)
+                </label>
 
-        </section>
+                <input
+                    type="number"
+                    id="ponderacion-evaluacion"
+                    placeholder="Ej: 25"
+                    min="0"
+                    max="100"
+                >
 
-
-        <section id="resultados" class="pantalla">
-
-            <h1>Resultados 📊</h1>
-
-            <div class="tarjeta">
-
-                <h2 id="nombreRamoResultado">
-                    Tu ramo
-                </h2>
 
                 <p>
-                    Promedio actual:
+                    ¿Esta evaluación está compuesta por otras notas?
                 </p>
 
-                <div id="promedioActual" class="numero-grande">
-                    -
+                <div class="opciones-radio">
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="tiene-subnotas"
+                            value="no"
+                            checked
+                            onchange="mostrarSubnotas(false)"
+                        >
+                        No
+                    </label>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="tiene-subnotas"
+                            value="si"
+                            onchange="mostrarSubnotas(true)"
+                        >
+                        Sí
+                    </label>
+
+                </div>
+
+
+                <div
+                    id="seccion-subnotas"
+                    class="oculto"
+                >
+
+                    <h3>¿Cómo se compone esta evaluación?</h3>
+
+                    <div id="lista-subnotas"></div>
+
+                    <button
+                        class="boton-secundario"
+                        onclick="agregarSubnota()"
+                    >
+                        + Agregar nota
+                    </button>
+
+                    <div
+                        id="total-subnotas"
+                        class="mensaje-validacion"
+                    ></div>
+
+                </div>
+
+
+                <div class="modal-botones">
+
+                    <button
+                        class="boton-secundario"
+                        onclick="cerrarModalEvaluacion()"
+                    >
+                        Cancelar
+                    </button>
+
+                    <button
+                        class="boton-principal"
+                        onclick="guardarEvaluacion()"
+                    >
+                        Guardar evaluación
+                    </button>
+
                 </div>
 
             </div>
 
+        </div>
 
-            <div class="tarjeta">
 
-                <h2>¿Qué nota necesitas?</h2>
+        <!-- =========================
+             MODAL CONFIRMACIÓN SALIDA
+        ========================== -->
 
-                <div id="notaNecesaria">
-                    -
+        <div
+            id="modal-salir"
+            class="modal oculto"
+        >
+
+            <div class="modal-contenido">
+
+                <h2>¿Quieres salir sin guardar los cambios?</h2>
+
+                <p>
+                    Los cambios realizados no se conservarán.
+                </p>
+
+                <div class="modal-botones">
+
+                    <button
+                        class="boton-secundario"
+                        onclick="cerrarModalSalir()"
+                    >
+                        Seguir editando
+                    </button>
+
+                    <button
+                        class="boton-eliminar"
+                        onclick="salirSinGuardar()"
+                    >
+                        Salir sin guardar
+                    </button>
+
                 </div>
 
             </div>
 
+        </div>
 
-            <div class="tarjeta">
-
-                <h2>Posibles resultados</h2>
-
-                <div id="posiblesResultados">
-                    -
-                </div>
-
-            </div>
-
-
-            <button
-                class="boton-secundario"
-                onclick="volverInicio()"
-            >
-                ← Volver a empezar
-            </button>
-
-        </section>
 
     </main>
 
@@ -168,4 +816,5 @@
     <script src="script.js"></script>
 
 </body>
+
 </html>
