@@ -1,1 +1,144 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
+body {
+    font-family: Arial, sans-serif;
+    background: #f7f3fb;
+    color: #4b4352;
+    min-height: 100vh;
+}
+
+.contenedor {
+    width: 90%;
+    max-width: 850px;
+    margin: 0 auto;
+    padding: 40px 0;
+}
+
+.pantalla {
+    display: none;
+}
+
+.pantalla.activa {
+    display: block;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 12px;
+    color: #685579;
+}
+
+h2 {
+    margin-bottom: 15px;
+    color: #725d7f;
+}
+
+p {
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.tarjeta {
+    background: white;
+    padding: 25px;
+    border-radius: 18px;
+    margin: 20px 0;
+    box-shadow: 0 5px 20px rgba(100, 80, 110, 0.08);
+}
+
+.botones {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+button {
+    border: none;
+    border-radius: 12px;
+    padding: 13px 20px;
+    font-size: 15px;
+    cursor: pointer;
+    background: #d9c6e5;
+    color: #4d4055;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.boton-principal {
+    display: block;
+    margin: 25px auto;
+    background: #b99acb;
+    color: white;
+    font-weight: bold;
+}
+
+.boton-secundario {
+    background: #eee5f2;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e3d8e8;
+    border-radius: 10px;
+    margin-top: 8px;
+    font-size: 16px;
+    outline: none;
+}
+
+input:focus {
+    border-color: #b99acb;
+}
+
+label {
+    font-weight: bold;
+}
+
+.numero-grande {
+    font-size: 42px;
+    font-weight: bold;
+    text-align: center;
+    color: #8c699b;
+    margin-top: 15px;
+}
+
+.evaluacion {
+    padding: 15px;
+    background: #faf7fc;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.evaluacion-grid {
+    display: grid;
+    grid-template-columns: 1fr 120px;
+    gap: 12px;
+    align-items: center;
+}
+
+@media (max-width: 600px) {
+
+    .contenedor {
+        width: 94%;
+        padding: 25px 0;
+    }
+
+    .botones {
+        flex-direction: column;
+    }
+
+    .botones button {
+        width: 100%;
+    }
+
+    .evaluacion-grid {
+        grid-template-columns: 1fr;
+    }
+}
