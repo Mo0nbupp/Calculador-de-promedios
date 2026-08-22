@@ -2081,3 +2081,20 @@ p {
     }
 
 }
+/* =========================================================
+   ANIMACIÓN DE TARJETAS DEL MENÚ
+========================================================= */
+
+.tarjeta-menu {
+    opacity: 0;
+    transform: translateX(25px);
+    transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.tarjeta-menu.tarjeta-visible {
+    opacity: 1;
+    transform: translateX(0);
+}
