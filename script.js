@@ -1,4 +1,3 @@
-
 /* =========================================================
    CALCULADORA DE PROMEDIOS
    Versión inicial
