@@ -997,30 +997,25 @@ input:disabled {
     display: none !important;
 }
 
-
 /* =========================================================
-   MENÚ
+   MENÚ LATERAL
 ========================================================= */
 
 .boton-menu {
     position: fixed;
 
     top: 22px;
-
     left: 22px;
 
-    z-index: 900;
+    z-index: 1200;
 
     width: 46px;
-
     height: 46px;
 
     border: 1px solid var(--borde);
-
     border-radius: 14px;
 
     background: var(--fondo-tarjeta);
-
     color: var(--texto);
 
     font-size: 1.35rem;
@@ -1040,17 +1035,19 @@ input:disabled {
 }
 
 
+/* =========================================================
+   PANEL DEL MENÚ
+========================================================= */
+
 .menu-lateral {
     position: fixed;
 
     top: 0;
-
     left: 0;
 
     z-index: 1100;
 
     width: min(310px, 85vw);
-
     height: 100vh;
 
     background: var(--fondo-tarjeta);
@@ -1064,11 +1061,13 @@ input:disabled {
     transform: translateX(-105%);
 
     transition:
-        transform 0.25s ease;
+        transform 0.35s ease;
 
     display: flex;
 
     flex-direction: column;
+
+    overflow: hidden;
 }
 
 
@@ -1076,6 +1075,10 @@ input:disabled {
     transform: translateX(0);
 }
 
+
+/* =========================================================
+   ENCABEZADO DEL MENÚ
+========================================================= */
 
 .menu-encabezado {
     display: flex;
@@ -1103,7 +1106,6 @@ input:disabled {
 
 .cerrar-menu {
     width: 34px;
-
     height: 34px;
 
     border: 0;
@@ -1115,8 +1117,23 @@ input:disabled {
     color: var(--texto);
 
     font-size: 1.4rem;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
 }
 
+
+.cerrar-menu:hover {
+    background: var(--color-secundario);
+
+    transform: scale(1.05);
+}
+
+
+/* =========================================================
+   OPCIONES DEL MENÚ
+========================================================= */
 
 .menu-navegacion {
     padding: 18px 12px;
@@ -1155,7 +1172,8 @@ input:disabled {
 
     transition:
         background 0.2s ease,
-        color 0.2s ease;
+        color 0.2s ease,
+        transform 0.2s ease;
 }
 
 
@@ -1178,8 +1196,14 @@ input:disabled {
     background: var(--color-secundario);
 
     color: var(--color-principal-hover);
+
+    transform: translateX(3px);
 }
 
+
+/* =========================================================
+   VERSIÓN DEL MENÚ
+========================================================= */
 
 .menu-version {
     margin-top: auto;
@@ -1195,6 +1219,10 @@ input:disabled {
     font-size: 0.82rem;
 }
 
+
+/* =========================================================
+   FONDO DEL MENÚ
+========================================================= */
 
 .fondo-menu {
     position: fixed;
@@ -1215,8 +1243,8 @@ input:disabled {
     pointer-events: none;
 
     transition:
-        opacity 0.25s ease,
-        visibility 0.25s ease;
+        opacity 0.35s ease,
+        visibility 0.35s ease;
 }
 
 
@@ -1229,12 +1257,43 @@ input:disabled {
 }
 
 
-.fondo-menu.activo {
-    opacity: 1;
+/* =========================================================
+   CONTENIDO CON DESPLAZAMIENTO
+========================================================= */
 
-    visibility: visible;
+.pantalla {
+    display: none;
+
+    width: 100%;
 }
 
+
+.pantalla.activa {
+    display: block;
+
+    animation:
+        deslizarContenido
+        0.35s ease;
+}
+
+
+@keyframes deslizarContenido {
+
+    from {
+        opacity: 0;
+
+        transform:
+            translateX(35px);
+    }
+
+    to {
+        opacity: 1;
+
+        transform:
+            translateX(0);
+    }
+
+}
 
 /* =========================================================
    TEMAS
