@@ -15,102 +15,465 @@
 <body>
 
     <!-- =====================================================
-         MENÚ
-    ====================================================== -->
+     MENÚ
+====================================================== -->
 
-    <button
-        id="boton-menu"
-        class="boton-menu"
-        onclick="abrirMenu()"
-        aria-label="Abrir menú"
-    >
-        ☰
-    </button>
-
-
-    <div
-        id="fondo-menu"
-        class="fondo-menu"
-        onclick="cerrarMenu()"
-    ></div>
+<button
+    id="boton-menu"
+    class="boton-menu"
+    onclick="abrirMenu()"
+    aria-label="Abrir menú"
+>
+    ☰
+</button>
 
 
-    <aside
-        id="menu-lateral"
-        class="menu-lateral"
-    >
+<div
+    id="fondo-menu"
+    class="fondo-menu"
+    onclick="cerrarMenu()"
+></div>
 
-        <div class="menu-encabezado">
 
-            <h2>Calculadora de Promedios</h2>
+<aside
+    id="menu-lateral"
+    class="menu-lateral"
+>
 
-            <button
-                class="cerrar-menu"
-                onclick="cerrarMenu()"
-                aria-label="Cerrar menú"
-            >
-                ×
-            </button>
+    <div class="menu-contenedor">
+
+
+        <!-- =============================================
+             PANEL PRINCIPAL
+        ============================================== -->
+
+        <div
+            id="menu-principal"
+            class="menu-panel menu-panel-principal"
+        >
+
+            <div class="menu-encabezado">
+
+                <h2>Calculadora de Promedios</h2>
+
+                <button
+                    class="cerrar-menu"
+                    onclick="cerrarMenu()"
+                    aria-label="Cerrar menú"
+                >
+                    ×
+                </button>
+
+            </div>
+
+
+            <nav class="menu-navegacion">
+
+                <button onclick="irAMisRamos()">
+
+                    <span>⌂</span>
+
+                    Mis ramos
+
+                </button>
+
+
+                <button onclick="abrirSubmenu('funciona')">
+
+                    <span>?</span>
+
+                    Cómo funciona
+
+                    <strong>›</strong>
+
+                </button>
+
+
+                <button onclick="abrirSubmenu('sugerencias')">
+
+                    <span>✦</span>
+
+                    Sugerencias
+
+                    <strong>›</strong>
+
+                </button>
+
+
+                <button onclick="abrirSubmenu('temas')">
+
+                    <span>◐</span>
+
+                    Temas
+
+                    <strong>›</strong>
+
+                </button>
+
+
+                <button onclick="abrirSubmenu('version')">
+
+                    <span>▣</span>
+
+                    Versión
+
+                    <strong>›</strong>
+
+                </button>
+
+            </nav>
+
+
+            <div class="menu-version">
+
+                v1.0
+
+            </div>
 
         </div>
 
 
-        <nav class="menu-navegacion">
 
-            <button onclick="irAMisRamos()">
+        <!-- =============================================
+             SUBMENÚ: CÓMO FUNCIONA
+        ============================================== -->
 
-                <span>⌂</span>
+        <div
+            id="submenu-funciona"
+            class="menu-panel menu-subpanel"
+        >
 
-                Mis ramos
+            <div class="submenu-encabezado">
 
-            </button>
+                <button
+                    class="boton-volver-menu"
+                    onclick="cerrarSubmenu()"
+                >
+                    ←
+                </button>
 
+                <h2>Cómo funciona</h2>
 
-            <button onclick="irComoFunciona()">
-
-                <span>?</span>
-
-                Cómo funciona
-
-            </button>
-
-
-            <button onclick="irSugerencias()">
-
-                <span>✦</span>
-
-                Sugerencias
-
-            </button>
+            </div>
 
 
-            <button onclick="irTemas()">
+            <div class="submenu-contenido">
 
-                <span>◐</span>
+                <div class="menu-tarjeta">
 
-                Temas
+                    <span>01</span>
 
-            </button>
+                    <div>
+
+                        <h3>Agrega tu ramo</h3>
+
+                        <p>
+                            Crea un nuevo ramo e indica
+                            si tiene laboratorio.
+                        </p>
+
+                    </div>
+
+                </div>
 
 
-            <button onclick="irVersion()">
+                <div class="menu-tarjeta">
 
-                <span>▣</span>
+                    <span>02</span>
 
-                Versión
+                    <div>
 
-            </button>
+                        <h3>Configura tus evaluaciones</h3>
 
-        </nav>
+                        <p>
+                            Agrega tus evaluaciones,
+                            notas y ponderaciones.
+                        </p>
+
+                    </div>
+
+                </div>
 
 
-        <div class="menu-version">
+                <div class="menu-tarjeta">
 
-            v1.0
+                    <span>03</span>
+
+                    <div>
+
+                        <h3>Revisa tu promedio</h3>
+
+                        <p>
+                            La calculadora actualizará
+                            tu promedio automáticamente.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="menu-tarjeta">
+
+                    <span>04</span>
+
+                    <div>
+
+                        <h3>Calcula lo que necesitas</h3>
+
+                        <p>
+                            Revisa qué nota necesitas
+                            para alcanzar tu objetivo.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
 
         </div>
 
-    </aside>
+
+
+        <!-- =============================================
+             SUBMENÚ: SUGERENCIAS
+        ============================================== -->
+
+        <div
+            id="submenu-sugerencias"
+            class="menu-panel menu-subpanel"
+        >
+
+            <div class="submenu-encabezado">
+
+                <button
+                    class="boton-volver-menu"
+                    onclick="cerrarSubmenu()"
+                >
+                    ←
+                </button>
+
+                <h2>Sugerencias</h2>
+
+            </div>
+
+
+            <div class="submenu-contenido">
+
+                <p class="submenu-descripcion">
+
+                    ¿Tienes una idea para mejorar
+                    la calculadora?
+
+                </p>
+
+
+                <label for="menu-tipo-sugerencia">
+                    Tipo de sugerencia
+                </label>
+
+                <select id="menu-tipo-sugerencia">
+
+                    <option value="">
+                        Selecciona una opción
+                    </option>
+
+                    <option value="funcion">
+                        Nueva función
+                    </option>
+
+                    <option value="diseño">
+                        Diseño
+                    </option>
+
+                    <option value="error">
+                        Reportar un error
+                    </option>
+
+                    <option value="otro">
+                        Otro
+                    </option>
+
+                </select>
+
+
+                <label for="menu-ramo-sugerencia">
+                    Ramo
+                </label>
+
+                <input
+                    type="text"
+                    id="menu-ramo-sugerencia"
+                    placeholder="Ej: Cálculo II"
+                >
+
+
+                <label for="menu-mensaje-sugerencia">
+                    Mensaje
+                </label>
+
+                <textarea
+                    id="menu-mensaje-sugerencia"
+                    placeholder="Cuéntanos tu sugerencia..."
+                ></textarea>
+
+
+                <button
+                    class="boton-principal"
+                    onclick="enviarSugerenciaMenu()"
+                >
+                    Enviar sugerencia
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =============================================
+             SUBMENÚ: TEMAS
+        ============================================== -->
+
+        <div
+            id="submenu-temas"
+            class="menu-panel menu-subpanel"
+        >
+
+            <div class="submenu-encabezado">
+
+                <button
+                    class="boton-volver-menu"
+                    onclick="cerrarSubmenu()"
+                >
+                    ←
+                </button>
+
+                <h2>Temas</h2>
+
+            </div>
+
+
+            <div class="submenu-contenido">
+
+                <p class="submenu-descripcion">
+
+                    Personaliza los colores
+                    de la calculadora.
+
+                </p>
+
+
+                <div class="menu-temas">
+
+                    <button
+                        class="menu-tema-opcion"
+                        onclick="cambiarTema('lila')"
+                    >
+
+                        <span class="tema-color lila"></span>
+
+                        Lila
+
+                    </button>
+
+
+                    <button
+                        class="menu-tema-opcion"
+                        onclick="cambiarTema('verde')"
+                    >
+
+                        <span class="tema-color verde"></span>
+
+                        Verde
+
+                    </button>
+
+
+                    <button
+                        class="menu-tema-opcion"
+                        onclick="cambiarTema('celeste')"
+                    >
+
+                        <span class="tema-color celeste"></span>
+
+                        Celeste
+
+                    </button>
+
+
+                    <button
+                        class="menu-tema-opcion"
+                        onclick="cambiarTema('rosa')"
+                    >
+
+                        <span class="tema-color rosa"></span>
+
+                        Rosa
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =============================================
+             SUBMENÚ: VERSIÓN
+        ============================================== -->
+
+        <div
+            id="submenu-version"
+            class="menu-panel menu-subpanel"
+        >
+
+            <div class="submenu-encabezado">
+
+                <button
+                    class="boton-volver-menu"
+                    onclick="cerrarSubmenu()"
+                >
+                    ←
+                </button>
+
+                <h2>Versión</h2>
+
+            </div>
+
+
+            <div class="submenu-contenido">
+
+                <div class="menu-version-card">
+
+                    <div class="menu-version-numero">
+                        v1.0
+                    </div>
+
+                    <div>
+
+                        <h3>Versión actual</h3>
+
+                        <p>
+                            Primera versión de la
+                            calculadora de promedios.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</aside>
 
 
 
