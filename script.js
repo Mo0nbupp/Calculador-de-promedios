@@ -3041,8 +3041,6 @@ function irAMisRamos() {
 
 function irComoFunciona() {
 
-    cerrarMenu();
-
     mostrarPantalla(
         "pantalla-como-funciona"
     );
@@ -3051,8 +3049,6 @@ function irComoFunciona() {
 
 
 function irSugerencias() {
-
-    cerrarMenu();
 
     mostrarPantalla(
         "pantalla-sugerencias"
@@ -3063,8 +3059,6 @@ function irSugerencias() {
 
 function irTemas() {
 
-    cerrarMenu();
-
     mostrarPantalla(
         "pantalla-temas"
     );
@@ -3073,8 +3067,6 @@ function irTemas() {
 
 
 function irVersion() {
-
-    cerrarMenu();
 
     mostrarPantalla(
         "pantalla-version"
