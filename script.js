@@ -1,6 +1,7 @@
+
 /* =========================================================
    CALCULADORA DE PROMEDIOS
-   Versión 1.0
+   Versión inicial
 ========================================================= */
 
 
@@ -8,10 +9,7 @@
    DATOS
 ========================================================= */
 
-let ramos =
-    JSON.parse(
-        localStorage.getItem("ramosCalculadora")
-    ) || [];
+let ramos = JSON.parse(localStorage.getItem("ramosCalculadora")) || [];
 
 let ramoActualId = null;
 
@@ -40,12 +38,8 @@ function guardarDatos() {
 
 function generarId() {
 
-    return (
-        Date.now().toString() +
-        Math.random()
-            .toString(36)
-            .substring(2, 8)
-    );
+    return Date.now().toString() +
+        Math.random().toString(36).substring(2, 8);
 
 }
 
@@ -68,37 +62,6 @@ function redondear(numero) {
 }
 
 
-function formatearNumero(numero) {
-
-    if (
-        numero === null ||
-        numero === undefined ||
-        isNaN(numero)
-    ) {
-
-        return "—";
-
-    }
-
-    return Number(numero)
-        .toFixed(2)
-        .replace(".", ",");
-
-}
-
-
-function escaparHTML(texto) {
-
-    const div =
-        document.createElement("div");
-
-    div.textContent = texto;
-
-    return div.innerHTML;
-
-}
-
-
 /* =========================================================
    CAMBIO DE PANTALLAS
 ========================================================= */
@@ -109,9 +72,7 @@ function mostrarPantalla(id) {
         .querySelectorAll(".pantalla")
         .forEach(pantalla => {
 
-            pantalla.classList.remove(
-                "activa"
-            );
+            pantalla.classList.remove("activa");
 
         });
 
@@ -122,9 +83,7 @@ function mostrarPantalla(id) {
 
     if (pantalla) {
 
-        pantalla.classList.add(
-            "activa"
-        );
+        pantalla.classList.add("activa");
 
     }
 
@@ -144,12 +103,7 @@ function mostrarPantalla(id) {
 function renderizarRamos() {
 
     const contenedor =
-        document.getElementById(
-            "lista-ramos"
-        );
-
-
-    if (!contenedor) return;
+        document.getElementById("lista-ramos");
 
 
     if (!ramos.length) {
@@ -199,9 +153,7 @@ function renderizarRamos() {
             </h3>
 
             <p>
-                ${escaparHTML(
-                    obtenerEstadoRamo(ramo)
-                )}
+                ${obtenerEstadoRamo(ramo)}
             </p>
 
             <div class="ramo-promedio">
@@ -267,10 +219,6 @@ function guardarNombreRamo() {
 
     if (!nombre) {
 
-        alert(
-            "Escribe el nombre del ramo."
-        );
-
         input.focus();
 
         return;
@@ -278,90 +226,41 @@ function guardarNombreRamo() {
     }
 
 
-    /*
-        Si estamos editando, solamente
-        actualizamos el nombre.
-    */
-
-    if (modoEdicion) {
-
-        const ramo =
-            obtenerRamoActual();
+    ramoActualId = generarId();
 
 
-        if (!ramo) return;
+    const nuevo = {
 
-
-        ramo.nombre =
-            nombre;
-
-
-        guardarDatos();
-
-
-        prepararPantallaEvaluaciones();
-
-
-        mostrarPantalla(
-            "pantalla-evaluaciones"
-        );
-
-
-        return;
-
-    }
-
-
-    ramoActualId =
-        generarId();
-
-
-    const nuevoRamo = {
-
-        id:
-            ramoActualId,
+        id: ramoActualId,
 
         nombre,
 
-        tieneLaboratorio:
-            false,
+        tieneLaboratorio: false,
 
-        porcentajeTeoria:
-            100,
+        porcentajeTeoria: 100,
 
-        porcentajeLaboratorio:
-            0,
+        porcentajeLaboratorio: 0,
 
-        evaluaciones:
-            [],
+        evaluaciones: [],
 
-        evaluacionesTeoria:
-            [],
+        evaluacionesTeoria: [],
 
-        evaluacionesLaboratorio:
-            [],
+        evaluacionesLaboratorio: [],
 
-        notaMinima:
-            4,
+        notaMinima: 4,
 
-        tienePAR:
-            false,
+        tienePAR: false,
 
-        porcentajePresentacion:
-            70,
+        porcentajePresentacion: 70,
 
-        porcentajeExamen:
-            30,
+        porcentajeExamen: 30,
 
-        objetivo:
-            null
+        objetivo: null
 
     };
 
 
-    ramos.push(
-        nuevoRamo
-    );
+    ramos.push(nuevo);
 
 
     guardarDatos();
@@ -387,9 +286,7 @@ function volverNuevoRamo() {
 }
 
 
-function seleccionarLaboratorio(
-    tieneLaboratorio
-) {
+function seleccionarLaboratorio(tieneLaboratorio) {
 
     const ramo =
         obtenerRamoActual();
@@ -410,11 +307,9 @@ function seleccionarLaboratorio(
 
     } else {
 
-        ramo.porcentajeTeoria =
-            100;
+        ramo.porcentajeTeoria = 100;
 
-        ramo.porcentajeLaboratorio =
-            0;
+        ramo.porcentajeLaboratorio = 0;
 
 
         prepararPantallaEvaluaciones();
@@ -466,16 +361,15 @@ function guardarDivision() {
         teoria + laboratorio;
 
 
-    if (
-        isNaN(teoria) ||
-        isNaN(laboratorio)
-    ) {
+    if (total !== 100) {
 
         mensaje.className =
-            "mensaje-validacion mensaje-peligro";
+            "mensaje-validacion mensaje-advertencia";
+
 
         mensaje.textContent =
-            "Ingresa ambos porcentajes.";
+            `La división suma ${total}%. Debe sumar 100%.`;
+
 
         return;
 
@@ -490,21 +384,10 @@ function guardarDivision() {
         mensaje.className =
             "mensaje-validacion mensaje-peligro";
 
+
         mensaje.textContent =
             "Los porcentajes no pueden ser negativos.";
 
-        return;
-
-    }
-
-
-    if (total !== 100) {
-
-        mensaje.className =
-            "mensaje-validacion mensaje-advertencia";
-
-        mensaje.textContent =
-            `La división suma ${total}%. Debe sumar 100%.`;
 
         return;
 
@@ -515,11 +398,9 @@ function guardarDivision() {
         obtenerRamoActual();
 
 
-    if (!ramo) return;
-
-
     ramo.porcentajeTeoria =
         teoria;
+
 
     ramo.porcentajeLaboratorio =
         laboratorio;
@@ -539,7 +420,7 @@ function guardarDivision() {
 
 
 /* =========================================================
-   CONFIGURACIÓN DE EVALUACIONES
+   EVALUACIONES
 ========================================================= */
 
 function prepararPantallaEvaluaciones() {
@@ -575,9 +456,11 @@ function prepararPantallaEvaluaciones() {
             "oculto"
         );
 
+
         bloqueTeoria.classList.remove(
             "oculto"
         );
+
 
         bloqueLaboratorio.classList.remove(
             "oculto"
@@ -613,9 +496,11 @@ function prepararPantallaEvaluaciones() {
             "oculto"
         );
 
+
         bloqueTeoria.classList.add(
             "oculto"
         );
+
 
         bloqueLaboratorio.classList.add(
             "oculto"
@@ -648,9 +533,7 @@ function prepararPantallaEvaluaciones() {
    AGREGAR EVALUACIÓN
 ========================================================= */
 
-function agregarEvaluacion(
-    tipo = null
-) {
+function agregarEvaluacion(tipo = null) {
 
     tipoEvaluacionActual =
         tipo;
@@ -676,17 +559,9 @@ function agregarEvaluacion(
     ).checked = false;
 
 
-    const radioNo =
-        document.querySelector(
-            'input[name="tiene-subnotas"][value="no"]'
-        );
-
-
-    if (radioNo) {
-
-        radioNo.checked = true;
-
-    }
+    document.querySelector(
+        'input[name="tiene-subnotas"][value="no"]'
+    ).checked = true;
 
 
     document.getElementById(
@@ -760,9 +635,7 @@ function cambiarEstadoNota() {
    SUBNOTAS
 ========================================================= */
 
-function mostrarSubnotas(
-    mostrar
-) {
+function mostrarSubnotas(mostrar) {
 
     const seccion =
         document.getElementById(
@@ -787,11 +660,6 @@ function mostrarSubnotas(
             "lista-subnotas"
         ).innerHTML = "";
 
-
-        document.getElementById(
-            "total-subnotas"
-        ).textContent = "";
-
     }
 
 }
@@ -805,6 +673,10 @@ function agregarSubnota() {
         );
 
 
+    const id =
+        generarId();
+
+
     const div =
         document.createElement("div");
 
@@ -814,7 +686,7 @@ function agregarSubnota() {
 
 
     div.dataset.id =
-        generarId();
+        id;
 
 
     div.innerHTML = `
@@ -871,21 +743,7 @@ function agregarSubnota() {
     `;
 
 
-    lista.appendChild(
-        div
-    );
-
-
-    const ponderacion =
-        div.querySelector(
-            ".subnota-ponderacion"
-        );
-
-
-    ponderacion.addEventListener(
-        "input",
-        actualizarTotalSubnotas
-    );
+    lista.appendChild(div);
 
 
     actualizarTotalSubnotas();
@@ -904,25 +762,23 @@ function actualizarTotalSubnotas() {
     let total = 0;
 
 
-    elementos.forEach(
-        elemento => {
+    elementos.forEach(elemento => {
 
-            const valor =
-                Number(
-                    elemento.querySelector(
-                        ".subnota-ponderacion"
-                    ).value
-                );
+        const valor =
+            Number(
+                elemento.querySelector(
+                    ".subnota-ponderacion"
+                ).value
+            );
 
 
-            if (!isNaN(valor)) {
+        if (!isNaN(valor)) {
 
-                total += valor;
-
-            }
+            total += valor;
 
         }
-    );
+
+    });
 
 
     const mensaje =
@@ -931,13 +787,11 @@ function actualizarTotalSubnotas() {
         );
 
 
-    if (!mensaje) return;
-
-
     if (total === 100) {
 
         mensaje.className =
             "mensaje-validacion mensaje-exito";
+
 
         mensaje.textContent =
             "Ponderación configurada: 100% ✓";
@@ -947,6 +801,7 @@ function actualizarTotalSubnotas() {
         mensaje.className =
             "mensaje-validacion mensaje-advertencia";
 
+
         mensaje.textContent =
             `Ponderación configurada: ${total}%. Aún falta asignar ${100 - total}%.`;
 
@@ -954,6 +809,7 @@ function actualizarTotalSubnotas() {
 
         mensaje.className =
             "mensaje-validacion mensaje-peligro";
+
 
         mensaje.textContent =
             `Ponderación configurada: ${total}%. Revisa las ponderaciones ingresadas.`;
@@ -1019,11 +875,7 @@ function guardarEvaluacion() {
 
     if (
         !pendiente &&
-        (
-            isNaN(nota) ||
-            nota < 1 ||
-            nota > 7
-        )
+        (isNaN(nota) || nota < 1 || nota > 7)
     ) {
 
         alert(
@@ -1050,15 +902,10 @@ function guardarEvaluacion() {
     }
 
 
-    const radioSubnotas =
+    const tieneSubnotas =
         document.querySelector(
             'input[name="tiene-subnotas"]:checked'
-        );
-
-
-    const tieneSubnotas =
-        radioSubnotas &&
-        radioSubnotas.value === "si";
+        ).value === "si";
 
 
     let subnotas = [];
@@ -1086,9 +933,7 @@ function guardarEvaluacion() {
         let totalSubnotas = 0;
 
 
-        for (
-            const elemento of elementos
-        ) {
+        elementos.forEach(elemento => {
 
             const nombreSubnota =
                 elemento.querySelector(
@@ -1122,11 +967,9 @@ function guardarEvaluacion() {
 
             if (!nombreSubnota) {
 
-                alert(
+                throw new Error(
                     "Todas las subnotas necesitan un nombre."
                 );
-
-                return;
 
             }
 
@@ -1140,26 +983,21 @@ function guardarEvaluacion() {
                 )
             ) {
 
-                alert(
+                throw new Error(
                     "Hay una subnota con una nota inválida."
                 );
-
-                return;
 
             }
 
 
             if (
                 isNaN(ponderacionSubnota) ||
-                ponderacionSubnota <= 0 ||
-                ponderacionSubnota > 100
+                ponderacionSubnota <= 0
             ) {
 
-                alert(
+                throw new Error(
                     "Hay una subnota con una ponderación inválida."
                 );
-
-                return;
 
             }
 
@@ -1170,8 +1008,7 @@ function guardarEvaluacion() {
 
             subnotas.push({
 
-                id:
-                    generarId(),
+                id: generarId(),
 
                 nombre:
                     nombreSubnota,
@@ -1187,12 +1024,10 @@ function guardarEvaluacion() {
 
             });
 
-        }
+        });
 
 
-        if (
-            totalSubnotas !== 100
-        ) {
+        if (totalSubnotas !== 100) {
 
             alert(
                 `Las ponderaciones de las subnotas deben sumar 100%. Actualmente suman ${totalSubnotas}%.`
@@ -1228,8 +1063,7 @@ function guardarEvaluacion() {
     if (ramo.tieneLaboratorio) {
 
         if (
-            tipoEvaluacionActual ===
-            "teoria"
+            tipoEvaluacionActual === "teoria"
         ) {
 
             ramo.evaluacionesTeoria.push(
@@ -1308,72 +1142,60 @@ function renderizarEvaluaciones(
     }
 
 
-    evaluaciones.forEach(
-        evaluacion => {
+    evaluaciones.forEach(evaluacion => {
 
-            const card =
-                document.createElement(
-                    "div"
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "evaluacion-card";
+
+
+        let notaTexto =
+            evaluacion.pendiente
+                ? "Pendiente"
+                : formatearNumero(
+                    calcularNotaEvaluacion(
+                        evaluacion
+                    )
                 );
 
 
-            card.className =
-                "evaluacion-card";
+        card.innerHTML = `
+
+            <h3>
+                ${escaparHTML(evaluacion.nombre)}
+            </h3>
+
+            <div class="evaluacion-info">
+
+                <span>
+                    Nota:
+                    <strong class="${
+                        evaluacion.pendiente
+                            ? "pendiente"
+                            : ""
+                    }">
+                        ${notaTexto}
+                    </strong>
+                </span>
+
+                <span>
+                    Ponderación:
+                    <strong>
+                        ${evaluacion.ponderacion}%
+                    </strong>
+                </span>
+
+            </div>
+
+        `;
 
 
-            const nota =
-                calcularNotaEvaluacion(
-                    evaluacion
-                );
+        contenedor.appendChild(card);
 
-
-            const notaTexto =
-                nota === null
-                    ? "Pendiente"
-                    : formatearNumero(
-                        nota
-                    );
-
-
-            card.innerHTML = `
-
-                <h3>
-                    ${escaparHTML(
-                        evaluacion.nombre
-                    )}
-                </h3>
-
-                <div class="evaluacion-info">
-
-                    <span>
-                        Nota:
-                        <strong class="${
-                            nota === null
-                                ? "pendiente"
-                                : ""
-                        }">
-                            ${notaTexto}
-                        </strong>
-                    </span>
-
-                    <span>
-                        Ponderación:
-                        <strong>
-                            ${evaluacion.ponderacion}%
-                        </strong>
-                    </span>
-
-                </div>
-
-            `;
-
-
-            contenedor.appendChild(
-                card
-            );
-
-        }
-    );
+    });
 
 }
 
@@ -1398,12 +1220,8 @@ function actualizarTotalPonderaciones(
 
     const total =
         evaluaciones.reduce(
-            (
-                suma,
-                evaluacion
-            ) =>
-                suma +
-                Number(
+            (suma, evaluacion) =>
+                suma + Number(
                     evaluacion.ponderacion
                 ),
             0
@@ -1415,6 +1233,7 @@ function actualizarTotalPonderaciones(
         mensaje.className =
             "mensaje-validacion mensaje-exito";
 
+
         mensaje.textContent =
             "Ponderación configurada: 100% ✓";
 
@@ -1423,6 +1242,7 @@ function actualizarTotalPonderaciones(
         mensaje.className =
             "mensaje-validacion mensaje-advertencia";
 
+
         mensaje.textContent =
             `Ponderación configurada: ${total}%. Aún falta asignar ${100 - total}%.`;
 
@@ -1430,6 +1250,7 @@ function actualizarTotalPonderaciones(
 
         mensaje.className =
             "mensaje-validacion mensaje-peligro";
+
 
         mensaje.textContent =
             `Ponderación configurada: ${total}%. Revisa las ponderaciones ingresadas.`;
@@ -1440,7 +1261,7 @@ function actualizarTotalPonderaciones(
 
 
 /* =========================================================
-   CÁLCULO DE UNA EVALUACIÓN
+   CÁLCULOS
 ========================================================= */
 
 function calcularNotaEvaluacion(
@@ -1458,8 +1279,7 @@ function calcularNotaEvaluacion(
 
     if (
         !evaluacion.tieneSubnotas ||
-        !evaluacion.subnotas ||
-        !evaluacion.subnotas.length
+        !evaluacion.subnotas?.length
     ) {
 
         return evaluacion.nota;
@@ -1467,8 +1287,12 @@ function calcularNotaEvaluacion(
     }
 
 
+    const subnotas =
+        evaluacion.subnotas;
+
+
     const disponibles =
-        evaluacion.subnotas.filter(
+        subnotas.filter(
             subnota =>
                 !subnota.pendiente &&
                 subnota.nota !== null
@@ -1477,7 +1301,7 @@ function calcularNotaEvaluacion(
 
     if (
         disponibles.length !==
-        evaluacion.subnotas.length
+        subnotas.length
     ) {
 
         return null;
@@ -1488,18 +1312,15 @@ function calcularNotaEvaluacion(
     let total = 0;
 
 
-    evaluacion.subnotas.forEach(
-        subnota => {
+    subnotas.forEach(subnota => {
 
-            total +=
-                subnota.nota *
-                (
-                    subnota.ponderacion /
-                    100
-                );
+        total +=
+            subnota.nota *
+            (
+                subnota.ponderacion / 100
+            );
 
-        }
-    );
+    });
 
 
     return redondear(total);
@@ -1507,17 +1328,11 @@ function calcularNotaEvaluacion(
 }
 
 
-/* =========================================================
-   PROMEDIO DE UNA LISTA
-========================================================= */
-
 function calcularPromedioLista(
     evaluaciones
 ) {
 
-    if (
-        !evaluaciones.length
-    ) {
+    if (!evaluaciones.length) {
 
         return null;
 
@@ -1525,6 +1340,7 @@ function calcularPromedioLista(
 
 
     let total = 0;
+
 
     let ponderacionDisponible = 0;
 
@@ -1549,9 +1365,7 @@ function calcularPromedioLista(
 
 
                 ponderacionDisponible +=
-                    Number(
-                        evaluacion.ponderacion
-                    );
+                    evaluacion.ponderacion;
 
             }
 
@@ -1578,10 +1392,6 @@ function calcularPromedioLista(
 
 }
 
-
-/* =========================================================
-   PROMEDIO DEL RAMO
-========================================================= */
 
 function calcularPromedioRamo(
     ramo
@@ -1617,6 +1427,7 @@ function calcularPromedioRamo(
                     100
                 );
 
+
             peso +=
                 ramo.porcentajeTeoria;
 
@@ -1631,6 +1442,7 @@ function calcularPromedioRamo(
                     ramo.porcentajeLaboratorio /
                     100
                 );
+
 
             peso +=
                 ramo.porcentajeLaboratorio;
@@ -1672,8 +1484,8 @@ function abrirRamo(id) {
     ramoActualId =
         id;
 
-    modoEdicion =
-        false;
+
+    modoEdicion = false;
 
 
     renderizarResumenRamo();
@@ -1707,9 +1519,13 @@ function renderizarResumenRamo() {
         );
 
 
-    document.getElementById(
-        "promedio-actual"
-    ).textContent =
+    const promedioElemento =
+        document.getElementById(
+            "promedio-actual"
+        );
+
+
+    promedioElemento.textContent =
         promedio === null
             ? "—"
             : formatearNumero(
@@ -1750,10 +1566,6 @@ function renderizarResumenRamo() {
 }
 
 
-/* =========================================================
-   RESUMEN DE EVALUACIONES
-========================================================= */
-
 function renderizarResumenEvaluaciones(
     ramo
 ) {
@@ -1764,21 +1576,17 @@ function renderizarResumenEvaluaciones(
         );
 
 
-    if (!contenedor) return;
-
-
     contenedor.innerHTML = "";
 
 
-    const grupos = [];
+    let grupos = [];
 
 
     if (ramo.tieneLaboratorio) {
 
         grupos.push({
 
-            titulo:
-                "Teoría",
+            titulo: "Teoría",
 
             evaluaciones:
                 ramo.evaluacionesTeoria
@@ -1788,8 +1596,7 @@ function renderizarResumenEvaluaciones(
 
         grupos.push({
 
-            titulo:
-                "Laboratorio",
+            titulo: "Laboratorio",
 
             evaluaciones:
                 ramo.evaluacionesLaboratorio
@@ -1800,8 +1607,7 @@ function renderizarResumenEvaluaciones(
 
         grupos.push({
 
-            titulo:
-                null,
+            titulo: null,
 
             evaluaciones:
                 ramo.evaluaciones
@@ -1907,7 +1713,7 @@ function renderizarResumenEvaluaciones(
 
 
 /* =========================================================
-   EVALUACIONES PENDIENTES
+   QUÉ NECESITAS PARA APROBAR
 ========================================================= */
 
 function obtenerEvaluacionesRamo(
@@ -1931,26 +1737,6 @@ function obtenerEvaluacionesRamo(
 }
 
 
-function obtenerEvaluacionesPendientes(
-    ramo
-) {
-
-    return obtenerEvaluacionesRamo(
-        ramo
-    ).filter(
-        evaluacion =>
-            calcularNotaEvaluacion(
-                evaluacion
-            ) === null
-    );
-
-}
-
-
-/* =========================================================
-   QUÉ NECESITAS PARA APROBAR
-========================================================= */
-
 function calcularQueNecesitas(
     ramo
 ) {
@@ -1959,9 +1745,6 @@ function calcularQueNecesitas(
         document.getElementById(
             "resultado-aprobar"
         );
-
-
-    if (!contenedor) return;
 
 
     const objetivo =
@@ -1999,9 +1782,7 @@ function calcularQueNecesitas(
 
                     Tu promedio final es
                     <strong>
-                        ${formatearNumero(
-                            promedio
-                        )}
+                        ${formatearNumero(promedio)}
                     </strong>.
 
                 </div>
@@ -2047,9 +1828,7 @@ function calcularQueNecesitas(
         );
 
 
-    if (
-        resultado === null
-    ) {
+    if (resultado === null) {
 
         contenedor.innerHTML = `
 
@@ -2066,9 +1845,7 @@ function calcularQueNecesitas(
     }
 
 
-    if (
-        resultado <= 1
-    ) {
+    if (resultado <= 1) {
 
         contenedor.innerHTML = `
 
@@ -2087,9 +1864,7 @@ function calcularQueNecesitas(
     }
 
 
-    if (
-        resultado > 7
-    ) {
+    if (resultado > 7) {
 
         contenedor.innerHTML = `
 
@@ -2098,9 +1873,7 @@ function calcularQueNecesitas(
                 Con las evaluaciones pendientes,
                 no es posible alcanzar
                 el promedio mínimo de
-                ${formatearNumero(
-                    objetivo
-                )}
+                ${formatearNumero(objetivo)}
                 solamente con ellas.
 
             </div>
@@ -2115,26 +1888,38 @@ function calcularQueNecesitas(
     contenedor.innerHTML = `
 
         <p>
-
             Necesitas obtener aproximadamente
             <strong>
-                ${formatearNumero(
-                    resultado
-                )}
+                ${formatearNumero(resultado)}
             </strong>
-
             en las evaluaciones pendientes
             para alcanzar
-
             <strong>
-                ${formatearNumero(
-                    objetivo
-                )}
+                ${formatearNumero(objetivo)}
             </strong>.
-
         </p>
 
     `;
+
+}
+
+
+function obtenerEvaluacionesPendientes(
+    ramo
+) {
+
+    const todas =
+        obtenerEvaluacionesRamo(
+            ramo
+        );
+
+
+    return todas.filter(
+        evaluacion =>
+            calcularNotaEvaluacion(
+                evaluacion
+            ) === null
+    );
 
 }
 
@@ -2144,252 +1929,20 @@ function calcularNotaNecesaria(
     objetivo
 ) {
 
-    /*
-        Para ramos sin laboratorio,
-        el cálculo utiliza directamente
-        las ponderaciones.
-
-        Para ramos con laboratorio,
-        se calcula respetando la división
-        teoría/laboratorio.
-    */
-
-    if (
-        !ramo.tieneLaboratorio
-    ) {
-
-        return calcularNotaNecesariaLista(
-            ramo.evaluaciones,
-            objetivo
-        );
-
-    }
-
-
-    const teoria =
-        calcularNotaNecesariaLista(
-            ramo.evaluacionesTeoria,
-            objetivo
+    const evaluaciones =
+        obtenerEvaluacionesRamo(
+            ramo
         );
 
 
-    const laboratorio =
-        calcularNotaNecesariaLista(
-            ramo.evaluacionesLaboratorio,
-            objetivo
-        );
-
-
-    const promedioTeoria =
-        calcularPromedioLista(
-            ramo.evaluacionesTeoria
-        );
-
-
-    const promedioLaboratorio =
-        calcularPromedioLista(
-            ramo.evaluacionesLaboratorio
-        );
-
-
-    const pendientesTeoria =
-        obtenerPendientesLista(
-            ramo.evaluacionesTeoria
-        );
-
-
-    const pendientesLaboratorio =
-        obtenerPendientesLista(
-            ramo.evaluacionesLaboratorio
-        );
-
-
-    /*
-        Si no hay pendientes en ninguno
-        de los dos bloques, no hay cálculo
-        que realizar.
-    */
-
-    if (
-        !pendientesTeoria.length &&
-        !pendientesLaboratorio.length
-    ) {
+    if (!evaluaciones.length) {
 
         return null;
 
     }
 
 
-    /*
-        Si hay pendientes solamente en teoría.
-    */
-
-    if (
-        pendientesTeoria.length &&
-        !pendientesLaboratorio.length
-    ) {
-
-        const objetivoTeoria =
-            (
-                objetivo -
-                (
-                    promedioLaboratorio *
-                    ramo.porcentajeLaboratorio /
-                    100
-                )
-            ) /
-            (
-                ramo.porcentajeTeoria /
-                100
-            );
-
-
-        return calcularNotaNecesariaLista(
-            ramo.evaluacionesTeoria,
-            objetivoTeoria
-        );
-
-    }
-
-
-    /*
-        Si hay pendientes solamente
-        en laboratorio.
-    */
-
-    if (
-        !pendientesTeoria.length &&
-        pendientesLaboratorio.length
-    ) {
-
-        const objetivoLaboratorio =
-            (
-                objetivo -
-                (
-                    promedioTeoria *
-                    ramo.porcentajeTeoria /
-                    100
-                )
-            ) /
-            (
-                ramo.porcentajeLaboratorio /
-                100
-            );
-
-
-        return calcularNotaNecesariaLista(
-            ramo.evaluacionesLaboratorio,
-            objetivoLaboratorio
-        );
-
-    }
-
-
-    /*
-        Si existen pendientes tanto
-        en teoría como en laboratorio,
-        mostramos un cálculo aproximado
-        considerando que se obtiene la
-        misma nota en todas las pendientes.
-    */
-
-    let aporteActual = 0;
-
-    let pesoPendiente = 0;
-
-
-    const procesarLista =
-        (
-            lista,
-            pesoBloque
-        ) => {
-
-            lista.forEach(
-                evaluacion => {
-
-                    const nota =
-                        calcularNotaEvaluacion(
-                            evaluacion
-                        );
-
-
-                    const peso =
-                        Number(
-                            evaluacion.ponderacion
-                        ) /
-                        100 *
-                        (
-                            pesoBloque /
-                            100
-                        );
-
-
-                    if (
-                        nota === null
-                    ) {
-
-                        pesoPendiente +=
-                            peso;
-
-                    } else {
-
-                        aporteActual +=
-                            nota *
-                            peso;
-
-                    }
-
-                }
-            );
-
-        };
-
-
-    procesarLista(
-        ramo.evaluacionesTeoria,
-        ramo.porcentajeTeoria
-    );
-
-
-    procesarLista(
-        ramo.evaluacionesLaboratorio,
-        ramo.porcentajeLaboratorio
-    );
-
-
-    if (
-        pesoPendiente <= 0
-    ) {
-
-        return null;
-
-    }
-
-
-    return redondear(
-        (
-            objetivo -
-            aporteActual
-        ) /
-        pesoPendiente
-    );
-
-}
-
-
-function calcularNotaNecesariaLista(
-    evaluaciones,
-    objetivo
-) {
-
-    if (
-        !evaluaciones.length
-    ) {
-
-        return null;
-
-    }
-
+    let pesoCompletado = 0;
 
     let aporteActual = 0;
 
@@ -2405,25 +1958,23 @@ function calcularNotaNecesariaLista(
                 );
 
 
-            const peso =
-                Number(
-                    evaluacion.ponderacion
-                ) /
-                100;
-
-
-            if (
-                nota === null
-            ) {
+            if (nota === null) {
 
                 pesoPendiente +=
-                    peso;
+                    evaluacion.ponderacion;
 
             } else {
 
                 aporteActual +=
                     nota *
-                    peso;
+                    (
+                        evaluacion.ponderacion /
+                        100
+                    );
+
+
+                pesoCompletado +=
+                    evaluacion.ponderacion;
 
             }
 
@@ -2440,26 +1991,19 @@ function calcularNotaNecesariaLista(
     }
 
 
-    return redondear(
+    const necesario =
         (
             objetivo -
             aporteActual
         ) /
-        pesoPendiente
-    );
+        (
+            pesoPendiente /
+            100
+        );
 
-}
 
-
-function obtenerPendientesLista(
-    evaluaciones
-) {
-
-    return evaluaciones.filter(
-        evaluacion =>
-            calcularNotaEvaluacion(
-                evaluacion
-            ) === null
+    return redondear(
+        necesario
     );
 
 }
@@ -2470,6 +2014,10 @@ function obtenerPendientesLista(
 ========================================================= */
 
 function cambiarObjetivo() {
+
+    const ramo =
+        obtenerRamoActual();
+
 
     const opcion =
         document.querySelector(
@@ -2484,14 +2032,12 @@ function cambiarObjetivo() {
 
 
     if (
-        opcion &&
-        opcion.value === "otro"
+        opcion?.value === "otro"
     ) {
 
         campo.classList.remove(
             "oculto"
         );
-
 
         calcularObjetivo();
 
@@ -2525,20 +2071,12 @@ function calcularObjetivo() {
         );
 
 
-    const contenedor =
-        document.getElementById(
-            "resultado-objetivo"
-        );
-
-
     if (
         !ramo ||
         isNaN(objetivo) ||
         objetivo < 1 ||
         objetivo > 7
     ) {
-
-        contenedor.innerHTML = "";
 
         return;
 
@@ -2552,9 +2090,13 @@ function calcularObjetivo() {
         );
 
 
-    if (
-        resultado === null
-    ) {
+    const contenedor =
+        document.getElementById(
+            "resultado-objetivo"
+        );
+
+
+    if (resultado === null) {
 
         contenedor.innerHTML =
             "No hay evaluaciones pendientes.";
@@ -2564,29 +2106,7 @@ function calcularObjetivo() {
     }
 
 
-    if (
-        resultado <= 1
-    ) {
-
-        contenedor.innerHTML = `
-
-            <div class="mensaje-exito">
-
-                Ya tienes lo necesario
-                para alcanzar ese promedio.
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    if (
-        resultado > 7
-    ) {
+    if (resultado > 7) {
 
         contenedor.innerHTML = `
 
@@ -2609,11 +2129,8 @@ function calcularObjetivo() {
 
         Necesitas aproximadamente
         <strong>
-            ${formatearNumero(
-                resultado
-            )}
+            ${formatearNumero(resultado)}
         </strong>
-
         en las evaluaciones pendientes.
 
     `;
@@ -2621,7 +2138,9 @@ function calcularObjetivo() {
 }
 
 
-function cargarObjetivo() {
+function cargarObjetivo(
+    ramo
+) {
 
     const minimo =
         document.querySelector(
@@ -2629,11 +2148,7 @@ function cargarObjetivo() {
         );
 
 
-    if (minimo) {
-
-        minimo.checked = true;
-
-    }
+    minimo.checked = true;
 
 
     document.getElementById(
@@ -2646,11 +2161,6 @@ function cargarObjetivo() {
     document.getElementById(
         "resultado-objetivo"
     ).innerHTML = "";
-
-
-    document.getElementById(
-        "otro-objetivo"
-    ).value = "";
 
 }
 
@@ -2673,7 +2183,9 @@ function mostrarPAR(
         obtenerRamoActual();
 
 
-    if (!ramo) return;
+    if (
+        !ramo
+    ) return;
 
 
     ramo.tienePAR =
@@ -2700,11 +2212,6 @@ function mostrarPAR(
             "oculto"
         );
 
-
-        document.getElementById(
-            "resultado-par"
-        ).innerHTML = "";
-
     }
 
 }
@@ -2724,28 +2231,26 @@ function prepararPAR(
         radio => {
 
             radio.checked =
-                radio.value ===
                 (
-                    ramo.tienePAR
-                        ? "si"
-                        : "no"
+                    radio.value ===
+                    (
+                        ramo.tienePAR
+                            ? "si"
+                            : "no"
+                    )
                 );
 
         }
     );
 
 
-    const contenido =
-        document.getElementById(
-            "contenido-par"
-        );
-
-
     if (
         !ramo.tienePAR
     ) {
 
-        contenido.classList.add(
+        document.getElementById(
+            "contenido-par"
+        ).classList.add(
             "oculto"
         );
 
@@ -2754,7 +2259,9 @@ function prepararPAR(
     }
 
 
-    contenido.classList.remove(
+    document.getElementById(
+        "contenido-par"
+    ).classList.remove(
         "oculto"
     );
 
@@ -2779,14 +2286,7 @@ function prepararPAR(
     contenedor.innerHTML = "";
 
 
-    document.getElementById(
-        "resultado-par"
-    ).innerHTML = "";
-
-
-    if (
-        !evaluaciones.length
-    ) {
+    if (!evaluaciones.length) {
 
         contenedor.innerHTML =
             "<p>Aún no tienes notas disponibles para reemplazar.</p>";
@@ -2821,10 +2321,9 @@ function prepararPAR(
 
             boton.addEventListener(
                 "click",
-                () =>
-                    calcularPAR(
-                        evaluacion.id
-                    )
+                () => calcularPAR(
+                    evaluacion.id
+                )
             );
 
 
@@ -2844,9 +2343,6 @@ function calcularPAR(
 
     const ramo =
         obtenerRamoActual();
-
-
-    if (!ramo) return;
 
 
     const evaluaciones =
@@ -2873,152 +2369,53 @@ function calcularPAR(
 
 
     const objetivo =
-        Number(
-            ramo.notaMinima
-        );
+        ramo.notaMinima;
 
 
     /*
-        Este cálculo corresponde a ramos
-        sin laboratorio.
+        Aquí dejamos preparado el cálculo
+        de la nota PAR necesaria.
+
+        La PAR reemplaza la nota seleccionada.
     */
 
-    if (
-        !ramo.tieneLaboratorio
-    ) {
-
-        let aporteSinNota = 0;
-
-
-        evaluaciones.forEach(
-            evaluacion => {
-
-                if (
-                    evaluacion.id ===
-                    evaluacionId
-                ) return;
-
-
-                const nota =
-                    calcularNotaEvaluacion(
-                        evaluacion
-                    );
-
-
-                if (nota !== null) {
-
-                    aporteSinNota +=
-                        nota *
-                        (
-                            evaluacion.ponderacion /
-                            100
-                        );
-
-                }
-
-            }
-        );
-
-
-        const pesoNota =
-            seleccionada.ponderacion /
-            100;
-
-
-        const notaNecesaria =
-            (
-                objetivo -
-                aporteSinNota
-            ) /
-            pesoNota;
-
-
-        mostrarResultadoPAR(
-            seleccionada,
-            notaActual,
-            notaNecesaria,
-            objetivo
-        );
-
-
-        return;
-
-    }
-
-
-    /*
-        Para laboratorio calculamos
-        respetando teoría/laboratorio.
-    */
 
     let aporteSinNota = 0;
 
-    let pesoSeleccionada = 0;
+
+    evaluaciones.forEach(
+        evaluacion => {
+
+            if (
+                evaluacion.id ===
+                evaluacionId
+            ) return;
 
 
-    const procesar =
-        (
-            lista,
-            pesoBloque
-        ) => {
-
-            lista.forEach(
-                evaluacion => {
-
-                    const peso =
-                        (
-                            evaluacion.ponderacion /
-                            100
-                        ) *
-                        (
-                            pesoBloque /
-                            100
-                        );
+            const nota =
+                calcularNotaEvaluacion(
+                    evaluacion
+                );
 
 
-                    if (
-                        evaluacion.id ===
-                        evaluacionId
-                    ) {
+            if (nota !== null) {
 
-                        pesoSeleccionada =
-                            peso;
+                aporteSinNota +=
+                    nota *
+                    (
+                        evaluacion.ponderacion /
+                        100
+                    );
 
-                        return;
+            }
 
-                    }
-
-
-                    const nota =
-                        calcularNotaEvaluacion(
-                            evaluacion
-                        );
-
-
-                    if (nota !== null) {
-
-                        aporteSinNota +=
-                            nota *
-                            peso;
-
-                    }
-
-                }
-            );
-
-        };
-
-
-    procesar(
-        ramo.evaluacionesTeoria,
-        ramo.porcentajeTeoria
+        }
     );
 
 
-    procesar(
-        ramo.evaluacionesLaboratorio,
-        ramo.porcentajeLaboratorio
-    );
+    const pesoNota =
+        seleccionada.ponderacion /
+        100;
 
 
     const notaNecesaria =
@@ -3026,25 +2423,8 @@ function calcularPAR(
             objetivo -
             aporteSinNota
         ) /
-        pesoSeleccionada;
+        pesoNota;
 
-
-    mostrarResultadoPAR(
-        seleccionada,
-        notaActual,
-        notaNecesaria,
-        objetivo
-    );
-
-}
-
-
-function mostrarResultadoPAR(
-    seleccionada,
-    notaActual,
-    notaNecesaria,
-    objetivo
-) {
 
     const contenedor =
         document.getElementById(
@@ -3083,9 +2463,7 @@ function mostrarResultadoPAR(
 
                 La PAR por sí sola no sería
                 suficiente para alcanzar
-                ${formatearNumero(
-                    objetivo
-                )}.
+                ${formatearNumero(objetivo)}.
 
             </div>
 
@@ -3102,32 +2480,20 @@ function mostrarResultadoPAR(
 
             Para alcanzar
             <strong>
-                ${formatearNumero(
-                    objetivo
-                )}
+                ${formatearNumero(objetivo)}
             </strong>
-
             reemplazando
             <strong>
-                ${escaparHTML(
-                    seleccionada.nombre
-                )}
+                ${escaparHTML(seleccionada.nombre)}
             </strong>
-
-            (${formatearNumero(
-                notaActual
-            )}),
-
+            (${formatearNumero(notaActual)}),
             necesitarías aproximadamente:
 
             <br><br>
 
             <strong>
-                ${formatearNumero(
-                    notaNecesaria
-                )}
+                ${formatearNumero(notaNecesaria)}
             </strong>
-
             en la PAR.
 
         </div>
@@ -3205,8 +2571,6 @@ function calcularExamen() {
 
 
     if (
-        isNaN(porcentajePresentacion) ||
-        isNaN(porcentajeExamen) ||
         porcentajePresentacion +
         porcentajeExamen !==
         100
@@ -3218,27 +2582,6 @@ function calcularExamen() {
 
                 Los porcentajes del examen
                 deben sumar 100%.
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-
-    if (
-        porcentajePresentacion < 0 ||
-        porcentajeExamen < 0
-    ) {
-
-        contenedor.innerHTML = `
-
-            <div class="mensaje-peligro">
-
-                Los porcentajes no pueden
-                ser negativos.
 
             </div>
 
@@ -3299,7 +2642,12 @@ function calcularExamen() {
 
         `;
 
-    } else if (
+        return;
+
+    }
+
+
+    if (
         necesario > 7
     ) {
 
@@ -3314,29 +2662,24 @@ function calcularExamen() {
 
         `;
 
-    } else {
-
-        contenedor.innerHTML = `
-
-            Para terminar con
-            <strong>
-                ${formatearNumero(
-                    minimo
-                )}
-            </strong>,
-
-            necesitas aproximadamente
-            <strong>
-                ${formatearNumero(
-                    necesario
-                )}
-            </strong>
-
-            en el examen.
-
-        `;
+        return;
 
     }
+
+
+    contenedor.innerHTML = `
+
+        Para terminar con
+        <strong>
+            ${formatearNumero(minimo)}
+        </strong>,
+        necesitas aproximadamente
+        <strong>
+            ${formatearNumero(necesario)}
+        </strong>
+        en el examen.
+
+    `;
 
 
     ramo.porcentajePresentacion =
@@ -3365,8 +2708,7 @@ function editarRamo() {
     if (!ramo) return;
 
 
-    modoEdicion =
-        true;
+    modoEdicion = true;
 
 
     document.getElementById(
@@ -3398,12 +2740,6 @@ function editarRamo() {
 
     }
 
-
-    /*
-        Vamos directamente a evaluaciones.
-        El nombre se puede modificar desde
-        la pantalla de nuevo ramo.
-    */
 
     prepararPantallaEvaluaciones();
 
@@ -3531,8 +2867,7 @@ function volverAnteriorConfiguracion() {
 
 
     if (
-        ramo &&
-        ramo.tieneLaboratorio
+        ramo?.tieneLaboratorio
     ) {
 
         mostrarPantalla(
@@ -3551,7 +2886,7 @@ function volverAnteriorConfiguracion() {
 
 
 /* =========================================================
-   ESTADO DEL RAMO
+   ESTADOS
 ========================================================= */
 
 function obtenerEstadoRamo(
@@ -3604,210 +2939,96 @@ function obtenerEstadoRamo(
 
 
 /* =========================================================
-   MENÚ LATERAL
+   FORMATO
+========================================================= */
+
+function formatearNumero(
+    numero
+) {
+
+    if (
+        numero === null ||
+        isNaN(numero)
+    ) {
+
+        return "—";
+
+    }
+
+
+    return Number(numero)
+        .toFixed(2)
+        .replace(".", ",");
+
+}
+
+
+function escaparHTML(
+    texto
+) {
+
+    const div =
+        document.createElement(
+            "div"
+        );
+
+
+    div.textContent =
+        texto;
+
+
+    return div.innerHTML;
+
+}
+
+
+/* =========================================================
+   INICIO
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        renderizarRamos();
+
+    }
+);
+/* =========================================================
+   MENÚ
 ========================================================= */
 
 function abrirMenu() {
 
-    const menu =
-        document.getElementById(
-            "menu-lateral"
-        );
+    document
+        .getElementById("menu-lateral")
+        .classList.add("abierto");
 
-
-    const fondo =
-        document.getElementById(
-            "fondo-menu"
-        );
-
-
-    if (menu) {
-
-        menu.classList.add(
-            "abierto"
-        );
-
-    }
-
-
-    if (fondo) {
-
-        fondo.classList.add(
-            "activo"
-        );
-
-    }
+    document
+        .getElementById("fondo-menu")
+        .classList.add("activo");
 
 }
 
 
 function cerrarMenu() {
 
-    const menu =
-        document.getElementById(
-            "menu-lateral"
-        );
-
-
-    const fondo =
-        document.getElementById(
-            "fondo-menu"
-        );
-
-
-    if (menu) {
-
-        menu.classList.remove(
-            "abierto"
-        );
-
-    }
-
-
-    if (fondo) {
-
-        fondo.classList.remove(
-            "activo"
-        );
-
-    }
-
-}
-
-
-/* =========================================================
-   OPCIONES DEL MENÚ
-========================================================= */
-
-function irAMisRamos() {
-
-    cerrarMenu();
-
-    cerrarPanelMenu();
-
-    volverMisRamos();
-
-}
-
-
-function irComoFunciona() {
-
-    cerrarMenu();
-
-    abrirPanelMenu(
-        "panel-como-funciona"
-    );
-
-}
-
-
-function irSugerencias() {
-
-    cerrarMenu();
-
-    abrirPanelMenu(
-        "panel-sugerencias"
-    );
-
-}
-
-
-function irTemas() {
-
-    cerrarMenu();
-
-    abrirPanelMenu(
-        "panel-temas"
-    );
-
-}
-
-
-function irVersion() {
-
-    cerrarMenu();
-
-    abrirPanelMenu(
-        "panel-version"
-    );
-
-}
-
-
-/* =========================================================
-   PANELES DEL MENÚ
-========================================================= */
-
-function abrirPanelMenu(
-    idPanel
-) {
-
-    cerrarPanelMenu();
-
-
-    const panel =
-        document.getElementById(
-            idPanel
-        );
-
-
-    if (!panel) return;
-
-
-    panel.classList.remove(
-        "oculto"
-    );
-
-
-    document.body.classList.add(
-        "panel-abierto"
-    );
-
-}
-
-
-function cerrarPanelMenu() {
+    document
+        .getElementById("menu-lateral")
+        .classList.remove("abierto");
 
     document
-        .querySelectorAll(
-            ".panel-menu"
-        )
-        .forEach(
-            panel => {
-
-                panel.classList.add(
-                    "oculto"
-                );
-
-            }
-        );
-
-
-    document.body.classList.remove(
-        "panel-abierto"
-    );
+        .getElementById("fondo-menu")
+        .classList.remove("activo");
 
 }
 
 
-/*
-    Permite cerrar el panel haciendo clic
-    en el fondo, pero no cuando se hace
-    clic dentro del contenido.
-*/
+function irDesdeMenu(pantalla) {
 
-function cerrarPanelDesdeFondo(
-    evento
-) {
+    cerrarMenu();
 
-    if (
-        evento.target ===
-        evento.currentTarget
-    ) {
-
-        cerrarPanelMenu();
-
-    }
+    mostrarPantalla(pantalla);
 
 }
 
@@ -3816,32 +3037,9 @@ function cerrarPanelDesdeFondo(
    TEMAS
 ========================================================= */
 
-function cambiarTema(
-    tema
-) {
+function cambiarTema(tema) {
 
-    const temasPermitidos = [
-        "lila",
-        "verde",
-        "celeste",
-        "rosa"
-    ];
-
-
-    if (
-        !temasPermitidos.includes(
-            tema
-        )
-    ) {
-
-        return;
-
-    }
-
-
-    document.body.dataset.tema =
-        tema;
-
+    document.body.dataset.tema = tema;
 
     localStorage.setItem(
         "temaCalculadora",
@@ -3876,12 +3074,10 @@ function enviarSugerencia() {
             "tipo-sugerencia"
         ).value;
 
-
     const ramo =
         document.getElementById(
             "ramo-sugerencia"
         ).value.trim();
-
 
     const mensaje =
         document.getElementById(
@@ -3889,10 +3085,7 @@ function enviarSugerencia() {
         ).value.trim();
 
 
-    if (
-        !tipo ||
-        !mensaje
-    ) {
+    if (!tipo || !mensaje) {
 
         alert(
             "Completa el tipo de sugerencia y el mensaje."
@@ -3904,21 +3097,10 @@ function enviarSugerencia() {
 
 
     /*
-        Actualmente las sugerencias
-        solamente muestran una confirmación.
-
-        Más adelante esta función se puede
-        conectar con Supabase.
+        Por ahora dejamos la función preparada.
+        Más adelante podemos conectarla con
+        Supabase o el sistema que decidamos.
     */
-
-    console.log(
-        "Sugerencia:",
-        {
-            tipo,
-            ramo,
-            mensaje
-        }
-    );
 
 
     alert(
@@ -3930,154 +3112,19 @@ function enviarSugerencia() {
         "tipo-sugerencia"
     ).value = "";
 
-
     document.getElementById(
         "ramo-sugerencia"
     ).value = "";
-
 
     document.getElementById(
         "mensaje-sugerencia"
     ).value = "";
 
-
-    cerrarPanelMenu();
-
 }
 
 
 /* =========================================================
-   TECLADO
-========================================================= */
-
-document.addEventListener(
-    "keydown",
-    evento => {
-
-        if (
-            evento.key !==
-            "Escape"
-        ) {
-
-            return;
-
-        }
-
-
-        /*
-            Si hay un modal abierto,
-            se cierra primero.
-        */
-
-        const modalEvaluacion =
-            document.getElementById(
-                "modal-evaluacion"
-            );
-
-
-        if (
-            modalEvaluacion &&
-            !modalEvaluacion.classList.contains(
-                "oculto"
-            )
-        ) {
-
-            cerrarModalEvaluacion();
-
-            return;
-
-        }
-
-
-        const modalSalir =
-            document.getElementById(
-                "modal-salir"
-            );
-
-
-        if (
-            modalSalir &&
-            !modalSalir.classList.contains(
-                "oculto"
-            )
-        ) {
-
-            cerrarModalSalir();
-
-            return;
-
-        }
-
-
-        /*
-            Después cerramos paneles.
-        */
-
-        const algunPanelAbierto =
-            document.querySelector(
-                ".panel-menu:not(.oculto)"
-            );
-
-
-        if (algunPanelAbierto) {
-
-            cerrarPanelMenu();
-
-            return;
-
-        }
-
-
-        /*
-            Finalmente cerramos el menú lateral.
-        */
-
-        cerrarMenu();
-
-    }
-);
-
-
-/* =========================================================
-   MODAL DE SALIDA
-========================================================= */
-
-function cerrarModalSalir() {
-
-    const modal =
-        document.getElementById(
-            "modal-salir"
-        );
-
-
-    if (!modal) return;
-
-
-    modal.classList.add(
-        "oculto"
-    );
-
-}
-
-
-function salirSinGuardar() {
-
-    cerrarModalSalir();
-
-    /*
-        Esta función queda preparada
-        para futuras ediciones más avanzadas.
-    */
-
-    mostrarPantalla(
-        "pantalla-ramo"
-    );
-
-}
-
-
-/* =========================================================
-   INICIO
+   INICIO DEL MENÚ
 ========================================================= */
 
 document.addEventListener(
@@ -4085,8 +3132,6 @@ document.addEventListener(
     () => {
 
         cargarTema();
-
-        renderizarRamos();
 
     }
 );
