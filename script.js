@@ -2993,32 +2993,39 @@ document.addEventListener(
 
     }
 );
+
 /* =========================================================
    MENÚ
 ========================================================= */
 
 function abrirMenu() {
 
-    document
-        .getElementById("menu-lateral")
-        .classList.add("abierto");
+    const menu =
+        document.getElementById("menu-lateral");
 
-    document
-        .getElementById("fondo-menu")
-        .classList.add("activo");
+    const fondo =
+        document.getElementById("fondo-menu");
+
+
+    menu.classList.add("abierto");
+
+    fondo.classList.add("activo");
 
 }
 
 
 function cerrarMenu() {
 
-    document
-        .getElementById("menu-lateral")
-        .classList.remove("abierto");
+    const menu =
+        document.getElementById("menu-lateral");
 
-    document
-        .getElementById("fondo-menu")
-        .classList.remove("activo");
+    const fondo =
+        document.getElementById("fondo-menu");
+
+
+    menu.classList.remove("abierto");
+
+    fondo.classList.remove("activo");
 
 }
 
@@ -3027,10 +3034,13 @@ function irDesdeMenu(pantalla) {
 
     cerrarMenu();
 
-    mostrarPantalla(pantalla);
+    setTimeout(() => {
+
+        mostrarPantalla(pantalla);
+
+    }, 180);
 
 }
-
 
 /* =========================================================
    TEMAS
