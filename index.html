@@ -122,7 +122,7 @@
 
 
         <div class="menu-version">
-            v1.0
+            v1.5
         </div>
 
     </aside>
@@ -967,86 +967,95 @@
              CÓMO FUNCIONA
         ================================================== -->
 
-        <div
-            id="panel-como-funciona"
-            class="panel-menu oculto"
-            onclick="cerrarPanelDesdeFondo(event)"
-        >
+        <div class="panel-tarjeta">
 
-            <div class="panel-contenido">
+    <h3>1. Agrega tu ramo</h3>
 
-                <div class="panel-encabezado">
+    <p>
+        Desde "Mis ramos", presiona "+ Agregar ramo" y escribe
+        el nombre de la asignatura que quieres registrar.
+    </p>
 
-                    <div>
+    <p>
+        Luego indica si el ramo tiene laboratorio y, si corresponde,
+        define qué porcentaje corresponde a teoría y cuál a laboratorio.
+    </p>
 
-                        <h2>Cómo funciona</h2>
-
-                        <p>
-                            Aprende a utilizar la calculadora.
-                        </p>
-
-                    </div>
+</div>
 
 
-                    <button
-                        class="panel-cerrar"
-                        onclick="cerrarPanelMenu()"
-                        aria-label="Cerrar"
-                    >
-                        ×
-                    </button>
+<div class="panel-tarjeta">
 
-                </div>
+    <h3>2. Configura tus evaluaciones</h3>
 
+    <p>
+        Agrega cada prueba, control, tarea, laboratorio o evaluación
+        que forme parte de tu ramo.
+    </p>
 
-                <div class="panel-tarjeta">
+    <p>
+        Para cada evaluación puedes indicar su nota y la ponderación
+        que representa dentro del ramo. Si todavía no tienes la nota,
+        puedes dejarla como pendiente.
+    </p>
 
-                    <h3>1. Agrega tu ramo</h3>
+    <p>
+        Si una evaluación está formada por varias notas, también puedes
+        agregar subnotas y definir cuánto pesa cada una.
+    </p>
 
-                    <p>
-                        Crea un nuevo ramo e indica si tiene laboratorio.
-                    </p>
-
-                </div>
-
-
-                <div class="panel-tarjeta">
-
-                    <h3>2. Configura tus evaluaciones</h3>
-
-                    <p>
-                        Agrega tus evaluaciones, sus notas y ponderaciones.
-                    </p>
-
-                </div>
+</div>
 
 
-                <div class="panel-tarjeta">
+<div class="panel-tarjeta">
 
-                    <h3>3. Revisa tu promedio</h3>
+    <h3>3. Revisa tu promedio</h3>
 
-                    <p>
-                        La calculadora actualizará tu promedio según las
-                        notas ingresadas.
-                    </p>
+    <p>
+        Una vez guardado el ramo, podrás ver tu promedio actual y
+        consultar todas las evaluaciones registradas.
+    </p>
 
-                </div>
+    <p>
+        Cuando agregues nuevas notas, podrás volver al ramo para
+        revisar cómo cambia tu promedio.
+    </p>
+
+</div>
 
 
-                <div class="panel-tarjeta">
+<div class="panel-tarjeta">
 
-                    <h3>4. Calcula lo que necesitas</h3>
+    <h3>4. Calcula qué necesitas</h3>
 
-                    <p>
-                        Puedes revisar qué nota necesitas para alcanzar
-                        tu objetivo.
-                    </p>
+    <p>
+        La calculadora te permite establecer un objetivo, como la
+        nota mínima para aprobar u otro promedio que quieras alcanzar.
+    </p>
 
-                </div>
+    <p>
+        También puedes revisar qué nota necesitarías en una evaluación
+        pendiente para acercarte a ese objetivo.
+    </p>
 
-            </div>
+</div>
 
-        </div>
+
+<div class="panel-tarjeta">
+
+    <h3>5. Usa las herramientas adicionales</h3>
+
+    <p>
+        Si tu ramo contempla una PAR o un examen, podrás utilizar
+        estas secciones para estimar qué resultado necesitas.
+    </p>
+
+    <p>
+        Estas herramientas son orientativas y dependen de las
+        ponderaciones que hayas configurado para tu ramo.
+    </p>
+
+</div>
 
 
 
@@ -1255,82 +1264,205 @@
 
 
 
-        <!-- =================================================
-             TARJETA FLOTANTE:
-             VERSIÓN
-        ================================================== -->
+<!-- =================================================
+     TARJETA FLOTANTE:
+     VERSIÓN
+================================================== -->
 
-        <div
-            id="panel-version"
-            class="panel-menu oculto"
-            onclick="cerrarPanelDesdeFondo(event)"
-        >
+<div
+    id="panel-version"
+    class="panel-menu oculto"
+    onclick="cerrarPanelDesdeFondo(event)"
+>
 
-            <div class="panel-contenido">
+    <div class="panel-contenido">
 
-                <div class="panel-encabezado">
+        <div class="panel-encabezado">
 
-                    <div>
+            <div>
 
-                        <h2>Versión</h2>
+                <h2>Versión</h2>
 
-                        <p>
-                            Historial de cambios de la calculadora.
-                        </p>
+                <p>
+                    Historial de cambios de la calculadora.
+                </p>
 
-                    </div>
+            </div>
 
 
-                    <button
-                        class="panel-cerrar"
-                        onclick="cerrarPanelMenu()"
-                        aria-label="Cerrar"
-                    >
-                        ×
-                    </button>
+            <button
+                class="panel-cerrar"
+                onclick="cerrarPanelMenu()"
+                aria-label="Cerrar"
+            >
+                ×
+            </button>
 
+        </div>
+
+
+        <div class="historial-versiones">
+
+
+            <!-- v1.5 -->
+
+            <div class="version-item actual">
+
+                <div class="version-numero">
+                    v1.5
                 </div>
 
+                <div class="version-info">
 
-                <div class="historial-versiones">
+                    <h3>
+                        Interfaz y personalización
+                    </h3>
 
-                    <div class="version-item actual">
-
-                        <div class="version-numero">
-                            v1.0
-                        </div>
-
-                        <div class="version-info">
-
-                            <h3>
-                                Versión actual
-                            </h3>
-
-                            <p>
-                                Primera versión de la calculadora
-                                de promedios.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!--
-                    AQUÍ SE PUEDEN AGREGAR FUTURAS VERSIONES.
-                    -->
+                    <p>
+                        Se incorpora el menú lateral, paneles
+                        informativos, sistema de temas y nuevas
+                        opciones de navegación. También se mejora
+                        la organización visual de la calculadora
+                        y se prepara la estructura para futuras
+                        funciones.
+                    </p>
 
                 </div>
 
             </div>
 
+
+            <!-- v1.4 -->
+
+            <div class="version-item">
+
+                <div class="version-numero">
+                    v1.4
+                </div>
+
+                <div class="version-info">
+
+                    <h3>
+                        PAR y examen
+                    </h3>
+
+                    <p>
+                        Se incorporan herramientas para calcular
+                        alternativas mediante PAR y estimar la
+                        nota necesaria en caso de examen.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- v1.3 -->
+
+            <div class="version-item">
+
+                <div class="version-numero">
+                    v1.3
+                </div>
+
+                <div class="version-info">
+
+                    <h3>
+                        Promedios y objetivos
+                    </h3>
+
+                    <p>
+                        Se agrega el cálculo del promedio actual
+                        y herramientas para determinar qué nota
+                        se necesita para alcanzar un objetivo.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- v1.2 -->
+
+            <div class="version-item">
+
+                <div class="version-numero">
+                    v1.2
+                </div>
+
+                <div class="version-info">
+
+                    <h3>
+                        Evaluaciones y ponderaciones
+                    </h3>
+
+                    <p>
+                        Se incorpora la creación de evaluaciones,
+                        ingreso de notas y configuración de
+                        ponderaciones.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- v1.1 -->
+
+            <div class="version-item">
+
+                <div class="version-numero">
+                    v1.1
+                </div>
+
+                <div class="version-info">
+
+                    <h3>
+                        Creación de ramos
+                    </h3>
+
+                    <p>
+                        Se agrega la posibilidad de crear y
+                        configurar ramos, incluyendo la opción
+                        de indicar si cuentan con laboratorio.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- v1.0 -->
+
+            <div class="version-item">
+
+                <div class="version-numero">
+                    v1.0
+                </div>
+
+                <div class="version-info">
+
+                    <h3>
+                        Primera versión
+                    </h3>
+
+                    <p>
+                        Primera versión de la Calculadora
+                        de Promedios y estructura inicial
+                        del proyecto.
+                    </p>
+
+                </div>
+
+            </div>
+
+
         </div>
 
+    </div>
 
-    </main>
-
-
-
+</div>
+       
     <!-- =====================================================
          WATERMARK
     ====================================================== -->
