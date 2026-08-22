@@ -1,186 +1,123 @@
+
 /* =========================================================
    CALCULADORA DE PROMEDIOS
-   SCRIPT PRINCIPAL
+   Diseño v1
 ========================================================= */
 
 
 /* =========================================================
-   VARIABLES
+   VARIABLES / TEMAS
 ========================================================= */
 
-let ramos = JSON.parse(localStorage.getItem("ramos")) || [];
+:root {
+    --color-principal: #a98bd4;
+    --color-principal-hover: #9674c7;
+    --color-secundario: #eee7f8;
 
-let ramoActual = null;
+    --fondo: #f8f7fb;
+    --fondo-tarjeta: #ffffff;
 
-let evaluacionesTemporales = [];
+    --texto: #38333f;
+    --texto-suave: #77717f;
 
-let tipoEvaluacionActual = null;
+    --borde: #e8e3ed;
 
-let subnotasTemporales = [];
+    --exito: #79a987;
+    --advertencia: #d6a45d;
+    --peligro: #c98282;
 
+    --sombra: 0 8px 25px rgba(60, 45, 75, 0.07);
 
-/* =========================================================
-   INICIO
-========================================================= */
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    cargarRamos();
-
-    cargarTema();
-
-    mostrarPantalla("pantalla-inicio");
-
-});
-
-
-/* =========================================================
-   MENÚ LATERAL
-========================================================= */
-
-function abrirMenu() {
-
-    const menu = document.getElementById("menu-lateral");
-    const fondo = document.getElementById("fondo-menu");
-
-    menu.classList.add("abierto");
-    fondo.classList.add("visible");
-
+    --radio: 18px;
 }
 
 
-function cerrarMenu() {
+body[data-tema="verde"] {
+    --color-principal: #91b69b;
+    --color-principal-hover: #789f83;
+    --color-secundario: #e6f0e8;
+}
 
-    const menu = document.getElementById("menu-lateral");
-    const fondo = document.getElementById("fondo-menu");
 
-    menu.classList.remove("abierto");
-    fondo.classList.remove("visible");
+body[data-tema="celeste"] {
+    --color-principal: #8eb8d2;
+    --color-principal-hover: #719fbf;
+    --color-secundario: #e5f0f6;
+}
 
+
+body[data-tema="rosa"] {
+    --color-principal: #d69aaa;
+    --color-principal-hover: #c78396;
+    --color-secundario: #f7e7ed;
 }
 
 
 /* =========================================================
-   NAVEGACIÓN DEL MENÚ
+   GENERAL
 ========================================================= */
 
-function irAMisRamos() {
-
-    cerrarPaneles();
-
-    cerrarMenu();
-
-    mostrarPantalla("pantalla-inicio");
-
+* {
+    box-sizing: border-box;
 }
 
 
-function irComoFunciona() {
-
-    abrirPanel("panel-como-funciona");
-
+html {
+    scroll-behavior: smooth;
 }
 
 
-function irSugerencias() {
+body {
+    margin: 0;
 
-    abrirPanel("panel-sugerencias");
+    min-height: 100vh;
 
+    background: var(--fondo);
+
+    color: var(--texto);
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease;
 }
 
 
-function irTemas() {
-
-    abrirPanel("panel-temas");
-
+button,
+input,
+textarea,
+select {
+    font: inherit;
 }
 
 
-function irVersion() {
+button {
+    cursor: pointer;
+}
 
-    abrirPanel("panel-version");
 
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--color-secundario);
+    outline-offset: 2px;
 }
 
 
 /* =========================================================
-   PANELES DEL MENÚ
+   APP
 ========================================================= */
 
-function abrirPanel(idPanel) {
+.app {
+    width: 100%;
+    min-height: 100vh;
 
-    const panel = document.getElementById(idPanel);
-
-    if (!panel) return;
-
-    cerrarOtrosPaneles(idPanel);
-
-    panel.classList.remove("oculto");
-
-    requestAnimationFrame(() => {
-        panel.classList.add("abierto");
-    });
-
-}
-
-
-function cerrarOtrosPaneles(excepto = "") {
-
-    const paneles = document.querySelectorAll(".panel-menu");
-
-    paneles.forEach(panel => {
-
-        if (panel.id !== excepto) {
-
-            panel.classList.remove("abierto");
-
-            setTimeout(() => {
-
-                panel.classList.add("oculto");
-
-            }, 300);
-
-        }
-
-    });
-
-}
-
-
-function cerrarPanelMenu() {
-
-    const paneles = document.querySelectorAll(".panel-menu");
-
-    paneles.forEach(panel => {
-
-        panel.classList.remove("abierto");
-
-        setTimeout(() => {
-
-            panel.classList.add("oculto");
-
-        }, 300);
-
-    });
-
-}
-
-
-function cerrarPaneles() {
-
-    cerrarPanelMenu();
-
-}
-
-
-function cerrarPanelDesdeFondo(event) {
-
-    if (event.target === event.currentTarget) {
-
-        cerrarPanelMenu();
-
-    }
-
+    padding-bottom: 60px;
 }
 
 
@@ -188,283 +125,597 @@ function cerrarPanelDesdeFondo(event) {
    PANTALLAS
 ========================================================= */
 
-function mostrarPantalla(id) {
+.pantalla {
+    display: none;
 
-    const pantallas = document.querySelectorAll(".pantalla");
-
-    pantallas.forEach(pantalla => {
-
-        pantalla.classList.remove("activa");
-
-    });
+    width: 100%;
+}
 
 
-    const pantalla = document.getElementById(id);
+.pantalla.activa {
+    display: block;
 
-    if (pantalla) {
+    animation: aparecer 0.22s ease;
+}
 
-        pantalla.classList.add("activa");
 
+@keyframes aparecer {
+
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 
 }
 
 
 /* =========================================================
-   MIS RAMOS
+   ENCABEZADO PRINCIPAL
 ========================================================= */
 
-function cargarRamos() {
+.encabezado-principal {
+    width: min(1100px, calc(100% - 40px));
 
-    const lista = document.getElementById("lista-ramos");
+    margin: 0 auto;
 
-    if (!lista) return;
-
-
-    if (ramos.length === 0) {
-
-        lista.innerHTML = `
-            <div class="sin-ramos">
-                <p>Todavía no tienes ramos guardados.</p>
-                <span>Agrega tu primer ramo para comenzar.</span>
-            </div>
-        `;
-
-        return;
-
-    }
+    padding:
+        70px 0 35px;
+}
 
 
-    lista.innerHTML = "";
+.encabezado-principal h1 {
+    margin: 0 0 10px;
+
+    font-size: clamp(2rem, 4vw, 3rem);
+
+    font-weight: 750;
+
+    letter-spacing: -1px;
+}
 
 
-    ramos.forEach((ramo, indice) => {
+.encabezado-principal p {
+    margin: 0;
 
-        const tarjeta = document.createElement("div");
+    color: var(--texto-suave);
 
-        tarjeta.className = "ramo-item";
-
-
-        const promedio = calcularPromedioRamo(ramo);
-
-
-        tarjeta.innerHTML = `
-
-            <div class="ramo-info">
-
-                <h3>${ramo.nombre}</h3>
-
-                <p>
-                    ${ramo.evaluaciones.length}
-                    evaluación${ramo.evaluaciones.length === 1 ? "" : "es"}
-                </p>
-
-            </div>
-
-
-            <div class="ramo-promedio">
-
-                <span>
-                    ${promedio !== null ? promedio.toFixed(1).replace(".", ",") : "—"}
-                </span>
-
-            </div>
-
-        `;
-
-
-        tarjeta.onclick = () => abrirRamo(indice);
-
-
-        lista.appendChild(tarjeta);
-
-    });
-
+    font-size: 1rem;
 }
 
 
 /* =========================================================
-   NUEVO RAMO
+   CONTENIDO
 ========================================================= */
 
-function nuevoRamo() {
+.contenido {
+    width: min(1000px, calc(100% - 40px));
 
-    ramoActual = {
+    margin: 0 auto;
 
-        nombre: "",
-
-        tieneLaboratorio: false,
-
-        porcentajeTeoria: 100,
-
-        porcentajeLaboratorio: 0,
-
-        evaluaciones: [],
-
-        notaMinima: 4,
-
-        porcentajePresentacion: 70,
-
-        porcentajeExamen: 30
-
-    };
-
-
-    document.getElementById("nombre-nuevo-ramo").value = "";
-
-    mostrarPantalla("pantalla-nuevo-ramo");
-
+    padding:
+        55px 0 30px;
 }
 
 
-function guardarNombreRamo() {
+.contenido-centrado {
+    width: min(650px, calc(100% - 40px));
 
-    const input = document.getElementById("nombre-nuevo-ramo");
+    margin: 0 auto;
 
-    const nombre = input.value.trim();
-
-
-    if (!nombre) {
-
-        alert("Escribe el nombre del ramo.");
-
-        input.focus();
-
-        return;
-
-    }
+    padding:
+        65px 0 30px;
+}
 
 
-    ramoActual.nombre = nombre;
+.contenido h1,
+.contenido-centrado h1 {
+    margin:
+        0 0 10px;
+
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+
+    letter-spacing: -0.6px;
+}
 
 
-    mostrarPantalla("pantalla-laboratorio");
+.descripcion {
+    margin:
+        0 0 30px;
 
+    color: var(--texto-suave);
+
+    line-height: 1.6;
 }
 
 
 /* =========================================================
-   LABORATORIO
+   SECCIÓN RAMOS
 ========================================================= */
 
-function seleccionarLaboratorio(tieneLaboratorio) {
+.seccion-ramos {
+    width: min(1100px, calc(100% - 40px));
 
-    ramoActual.tieneLaboratorio = tieneLaboratorio;
+    margin: 0 auto;
+}
 
 
-    if (!tieneLaboratorio) {
+.titulo-seccion {
+    display: flex;
 
-        ramoActual.porcentajeTeoria = 100;
+    align-items: center;
 
-        ramoActual.porcentajeLaboratorio = 0;
+    justify-content: space-between;
 
-        prepararEvaluacionesGenerales();
+    gap: 20px;
 
-        mostrarPantalla("pantalla-evaluaciones");
+    margin-bottom: 20px;
+}
 
-    } else {
 
-        mostrarPantalla("pantalla-division");
+.titulo-seccion h2 {
+    margin: 0;
 
-    }
-
+    font-size: 1.45rem;
 }
 
 
 /* =========================================================
-   DIVISIÓN
+   BOTONES
 ========================================================= */
 
-function guardarDivision() {
+.boton-principal,
+.boton-secundario,
+.boton-agregar,
+.boton-eliminar {
+    border: 0;
 
-    const teoria = Number(
-        document.getElementById("porcentaje-teoria").value
-    );
+    border-radius: 12px;
 
-    const laboratorio = Number(
-        document.getElementById("porcentaje-laboratorio").value
-    );
+    padding:
+        11px 18px;
 
+    font-weight: 650;
 
-    const mensaje = document.getElementById("mensaje-division");
-
-
-    if (
-        teoria < 0 ||
-        laboratorio < 0 ||
-        teoria > 100 ||
-        laboratorio > 100
-    ) {
-
-        mensaje.textContent =
-            "Los porcentajes deben estar entre 0% y 100%.";
-
-        return;
-
-    }
-
-
-    if (teoria + laboratorio !== 100) {
-
-        mensaje.textContent =
-            "La teoría y el laboratorio deben sumar exactamente 100%.";
-
-        return;
-
-    }
-
-
-    mensaje.textContent = "";
-
-
-    ramoActual.porcentajeTeoria = teoria;
-
-    ramoActual.porcentajeLaboratorio = laboratorio;
-
-
-    prepararEvaluacionesGenerales();
-
-
-    mostrarPantalla("pantalla-evaluaciones");
-
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
 }
 
 
-function prepararEvaluacionesGenerales() {
+.boton-principal {
+    background: var(--color-principal);
 
-    document
-        .getElementById("bloque-evaluaciones")
-        .classList.toggle(
-            "oculto",
-            ramoActual.tieneLaboratorio
-        );
+    color: white;
 
-
-    document
-        .getElementById("bloque-teoria")
-        .classList.toggle(
-            "oculto",
-            !ramoActual.tieneLaboratorio
-        );
+    box-shadow:
+        0 5px 14px rgba(80, 60, 100, 0.12);
+}
 
 
-    document
-        .getElementById("bloque-laboratorio")
-        .classList.toggle(
-            "oculto",
-            !ramoActual.tieneLaboratorio
-        );
+.boton-principal:hover,
+.boton-agregar:hover {
+    background: var(--color-principal-hover);
+
+    transform: translateY(-1px);
+}
 
 
-    document.getElementById("lista-evaluaciones").innerHTML = "";
+.boton-secundario {
+    background: var(--color-secundario);
 
-    document.getElementById("lista-teoria").innerHTML = "";
+    color: var(--texto);
+}
 
-    document.getElementById("lista-laboratorio").innerHTML = "";
+
+.boton-secundario:hover {
+    transform: translateY(-1px);
+}
 
 
-    evaluacionesTemporales = [];
+.boton-agregar {
+    background: var(--color-principal);
 
+    color: white;
+}
+
+
+.boton-eliminar {
+    background: #f8e7e7;
+
+    color: #a85e5e;
+}
+
+
+.boton-eliminar:hover {
+    background: #f3dada;
+}
+
+
+/* =========================================================
+   BARRA SUPERIOR
+========================================================= */
+
+.barra-superior {
+    width: min(1000px, calc(100% - 40px));
+
+    margin: 0 auto;
+
+    padding-top: 28px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.barra-superior button {
+    border: 0;
+
+    background: transparent;
+
+    color: var(--texto-suave);
+
+    padding: 8px 0;
+
+    font-weight: 600;
+
+    transition: color 0.2s ease;
+}
+
+
+.barra-superior button:hover {
+    color: var(--color-principal-hover);
+}
+
+
+/* =========================================================
+   TARJETAS
+========================================================= */
+
+.tarjeta {
+    background: var(--fondo-tarjeta);
+
+    border: 1px solid var(--borde);
+
+    border-radius: var(--radio);
+
+    padding: 24px;
+
+    margin-bottom: 18px;
+
+    box-shadow: var(--sombra);
+}
+
+
+.tarjeta h2 {
+    margin:
+        0 0 18px;
+
+    font-size: 1.2rem;
+}
+
+
+.tarjeta h3 {
+    margin:
+        0 0 12px;
+
+    font-size: 1rem;
+}
+
+
+.tarjeta p {
+    color: var(--texto-suave);
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   RAMOS
+========================================================= */
+
+#lista-ramos {
+    display: grid;
+
+    grid-template-columns:
+        repeat(auto-fill, minmax(240px, 1fr));
+
+    gap: 18px;
+}
+
+
+.ramo-card {
+    position: relative;
+
+    background: var(--fondo-tarjeta);
+
+    border: 1px solid var(--borde);
+
+    border-radius: var(--radio);
+
+    padding: 23px;
+
+    min-height: 170px;
+
+    cursor: pointer;
+
+    box-shadow: var(--sombra);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.ramo-card:hover {
+    transform: translateY(-3px);
+
+    border-color: var(--color-principal);
+
+    box-shadow:
+        0 12px 28px rgba(60, 45, 75, 0.11);
+}
+
+
+.ramo-card h3 {
+    margin:
+        0 0 8px;
+
+    font-size: 1.15rem;
+}
+
+
+.ramo-card p {
+    margin: 0;
+
+    color: var(--texto-suave);
+
+    font-size: 0.9rem;
+
+    line-height: 1.4;
+}
+
+
+.ramo-promedio {
+    position: absolute;
+
+    right: 20px;
+
+    bottom: 18px;
+
+    color: var(--color-principal-hover);
+
+    font-size: 1.65rem;
+
+    font-weight: 750;
+}
+
+
+/* =========================================================
+   SIN RAMOS
+========================================================= */
+
+.sin-ramos {
+    grid-column: 1 / -1;
+
+    text-align: center;
+
+    background: var(--fondo-tarjeta);
+
+    border:
+        1px dashed var(--borde);
+
+    border-radius: var(--radio);
+
+    padding: 45px 25px;
+
+    color: var(--texto-suave);
+}
+
+
+.sin-ramos p {
+    margin:
+        0 0 6px;
+
+    color: var(--texto);
+
+    font-weight: 650;
+}
+
+
+.sin-ramos span {
+    font-size: 0.92rem;
+}
+
+
+/* =========================================================
+   FORMULARIOS
+========================================================= */
+
+label {
+    display: block;
+
+    margin:
+        0 0 8px;
+
+    font-size: 0.92rem;
+
+    font-weight: 650;
+}
+
+
+input,
+textarea,
+select {
+    width: 100%;
+
+    border:
+        1px solid var(--borde);
+
+    border-radius: 11px;
+
+    background: #fff;
+
+    color: var(--texto);
+
+    padding:
+        12px 14px;
+
+    margin-bottom: 18px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: var(--color-principal);
+
+    box-shadow:
+        0 0 0 3px var(--color-secundario);
+
+    outline: none;
+}
+
+
+textarea {
+    resize: vertical;
+
+    min-height: 120px;
+}
+
+
+input:disabled {
+    background: #f1eef4;
+
+    cursor: not-allowed;
+}
+
+
+/* =========================================================
+   PORCENTAJES
+========================================================= */
+
+.campo-porcentaje {
+    margin-bottom: 18px;
+}
+
+
+.campo-con-unidad {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+}
+
+
+.campo-con-unidad input {
+    margin: 0;
+}
+
+
+.campo-con-unidad span {
+    color: var(--texto-suave);
+
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   OPCIONES
+========================================================= */
+
+.opciones {
+    display: grid;
+
+    gap: 14px;
+
+    margin-top: 25px;
+}
+
+
+.opcion {
+    width: 100%;
+
+    border:
+        1px solid var(--borde);
+
+    border-radius: 14px;
+
+    background: var(--fondo-tarjeta);
+
+    color: var(--texto);
+
+    padding: 17px;
+
+    text-align: left;
+
+    font-weight: 650;
+
+    box-shadow: var(--sombra);
+
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.opcion:hover {
+    border-color: var(--color-principal);
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   RADIO / CHECKBOX
+========================================================= */
+
+.opciones-radio {
+    display: flex;
+
+    flex-wrap: wrap;
+
+    gap: 14px 25px;
+
+    margin-bottom: 18px;
+}
+
+
+.opciones-radio label,
+.checkbox {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+
+.opciones-radio input,
+.checkbox input {
+    width: auto;
+
+    margin: 0;
 }
 
 
@@ -472,1176 +723,155 @@ function prepararEvaluacionesGenerales() {
    EVALUACIONES
 ========================================================= */
 
-function agregarEvaluacion(tipo = "general") {
-
-    tipoEvaluacionActual = tipo;
-
-    subnotasTemporales = [];
-
-
-    document.getElementById("nombre-evaluacion").value = "";
-
-    document.getElementById("nota-evaluacion").value = "";
-
-    document.getElementById("ponderacion-evaluacion").value = "";
-
-    document.getElementById("nota-pendiente").checked = false;
-
-
-    document
-        .getElementById("seccion-subnotas")
-        .classList.add("oculto");
-
-
-    document.getElementById("lista-subnotas").innerHTML = "";
-
-    document.getElementById("total-subnotas").textContent = "";
-
-
-    document
-        .getElementById("modal-evaluacion")
-        .classList.remove("oculto");
-
+.bloque-evaluaciones {
+    margin-bottom: 28px;
 }
 
 
-function cerrarModalEvaluacion() {
+.bloque-evaluaciones > h2 {
+    margin:
+        0 0 15px;
 
-    document
-        .getElementById("modal-evaluacion")
-        .classList.add("oculto");
-
+    font-size: 1.2rem;
 }
 
 
-function cambiarEstadoNota() {
+.evaluacion-card {
+    background: var(--fondo-tarjeta);
 
-    const pendiente =
-        document.getElementById("nota-pendiente").checked;
+    border:
+        1px solid var(--borde);
 
+    border-radius: 14px;
 
-    const nota =
-        document.getElementById("nota-evaluacion");
+    padding: 18px;
 
+    margin-bottom: 12px;
 
-    nota.disabled = pendiente;
-
-
-    if (pendiente) {
-
-        nota.value = "";
-
-    }
-
+    box-shadow:
+        0 4px 15px rgba(60, 45, 75, 0.045);
 }
 
 
-function mostrarSubnotas(mostrar) {
+.evaluacion-card h3 {
+    margin:
+        0 0 12px;
 
-    const seccion =
-        document.getElementById("seccion-subnotas");
-
-
-    if (mostrar) {
-
-        seccion.classList.remove("oculto");
-
-    } else {
-
-        seccion.classList.add("oculto");
-
-    }
-
+    font-size: 1rem;
 }
 
 
-function agregarSubnota() {
+.evaluacion-info {
+    display: flex;
 
-    const id = Date.now();
+    flex-wrap: wrap;
 
+    gap: 10px 25px;
 
-    subnotasTemporales.push({
+    color: var(--texto-suave);
 
-        id: id,
-
-        nombre: "",
-
-        nota: null,
-
-        ponderacion: 0
-
-    });
-
-
-    renderizarSubnotas();
-
+    font-size: 0.9rem;
 }
 
 
-function renderizarSubnotas() {
-
-    const contenedor =
-        document.getElementById("lista-subnotas");
-
-
-    contenedor.innerHTML = "";
-
-
-    subnotasTemporales.forEach((subnota, indice) => {
-
-        const div = document.createElement("div");
-
-        div.className = "fila-subnota";
-
-
-        div.innerHTML = `
-
-            <input
-                type="text"
-                placeholder="Nombre"
-                value="${subnota.nombre}"
-                oninput="actualizarSubnota(${indice}, 'nombre', this.value)"
-            >
-
-            <input
-                type="number"
-                placeholder="Nota"
-                min="1"
-                max="7"
-                step="0.1"
-                value="${subnota.nota ?? ""}"
-                oninput="actualizarSubnota(${indice}, 'nota', this.value)"
-            >
-
-            <input
-                type="number"
-                placeholder="%"
-                min="0"
-                max="100"
-                value="${subnota.ponderacion || ""}"
-                oninput="actualizarSubnota(${indice}, 'ponderacion', this.value)"
-            >
-
-            <button
-                type="button"
-                onclick="eliminarSubnota(${indice})"
-            >
-                ×
-            </button>
-
-        `;
-
-
-        contenedor.appendChild(div);
-
-    });
-
-
-    validarSubnotas();
-
+.evaluacion-info strong {
+    color: var(--texto);
 }
 
 
-function actualizarSubnota(indice, campo, valor) {
-
-    if (campo === "nota") {
-
-        subnotasTemporales[indice][campo] =
-            valor === "" ? null : Number(valor);
-
-    } else if (campo === "ponderacion") {
-
-        subnotasTemporales[indice][campo] =
-            valor === "" ? 0 : Number(valor);
-
-    } else {
-
-        subnotasTemporales[indice][campo] = valor;
-
-    }
-
-
-    validarSubnotas();
-
-}
-
-
-function eliminarSubnota(indice) {
-
-    subnotasTemporales.splice(indice, 1);
-
-    renderizarSubnotas();
-
-}
-
-
-function validarSubnotas() {
-
-    const mensaje =
-        document.getElementById("total-subnotas");
-
-
-    if (subnotasTemporales.length === 0) {
-
-        mensaje.textContent = "";
-
-        return false;
-
-    }
-
-
-    const total =
-        subnotasTemporales.reduce(
-            (suma, subnota) =>
-                suma + Number(subnota.ponderacion || 0),
-            0
-        );
-
-
-    if (total === 100) {
-
-        mensaje.textContent =
-            "✓ Las ponderaciones suman 100%.";
-
-        return true;
-
-    }
-
-
-    mensaje.textContent =
-        `Las ponderaciones suman ${total}%. Deben sumar 100%.`;
-
-    return false;
-
+.evaluacion-info .pendiente {
+    color: var(--advertencia);
 }
 
 
 /* =========================================================
-   GUARDAR EVALUACIÓN
+   VALIDACIONES
 ========================================================= */
 
-function guardarEvaluacion() {
+.mensaje-validacion {
+    margin:
+        12px 0 18px;
 
-    const nombre =
-        document.getElementById("nombre-evaluacion")
-            .value.trim();
+    padding: 11px 14px;
 
+    border-radius: 10px;
 
-    const pendiente =
-        document.getElementById("nota-pendiente").checked;
-
-
-    const notaInput =
-        document.getElementById("nota-evaluacion").value;
-
-
-    const ponderacion =
-        Number(
-            document.getElementById("ponderacion-evaluacion").value
-        );
-
-
-    if (!nombre) {
-
-        alert("Escribe el nombre de la evaluación.");
-
-        return;
-
-    }
-
-
-    if (
-        !pendiente &&
-        (notaInput === "" ||
-        Number(notaInput) < 1 ||
-        Number(notaInput) > 7)
-    ) {
-
-        alert("Ingresa una nota válida entre 1,0 y 7,0.");
-
-        return;
-
-    }
-
-
-    if (
-        ponderacion <= 0 ||
-        ponderacion > 100
-    ) {
-
-        alert("Ingresa una ponderación válida.");
-
-        return;
-
-    }
-
-
-    const tieneSubnotas =
-        !document
-            .getElementById("seccion-subnotas")
-            .classList.contains("oculto");
-
-
-    if (
-        tieneSubnotas &&
-        subnotasTemporales.length > 0 &&
-        !validarSubnotas()
-    ) {
-
-        alert("Las subnotas deben sumar 100%.");
-
-        return;
-
-    }
-
-
-    const evaluacion = {
-
-        nombre: nombre,
-
-        nota: pendiente ? null : Number(notaInput),
-
-        ponderacion: ponderacion,
-
-        pendiente: pendiente,
-
-        tipo: tipoEvaluacionActual,
-
-        subnotas:
-            tieneSubnotas
-                ? [...subnotasTemporales]
-                : []
-
-    };
-
-
-    const lista =
-
-        tipoEvaluacionActual === "teoria"
-            ? document.getElementById("lista-teoria")
-            : tipoEvaluacionActual === "laboratorio"
-                ? document.getElementById("lista-laboratorio")
-                : document.getElementById("lista-evaluaciones");
-
-
-    agregarEvaluacionVisual(
-        lista,
-        evaluacion
-    );
-
-
-    evaluacionesTemporales.push(evaluacion);
-
-
-    actualizarTotalesEvaluaciones();
-
-
-    cerrarModalEvaluacion();
-
+    font-size: 0.9rem;
 }
 
 
-function agregarEvaluacionVisual(lista, evaluacion) {
+.mensaje-exito {
+    background: #e9f3eb;
 
-    const div = document.createElement("div");
+    color: #547d5e;
 
-    div.className = "evaluacion-item";
+    border-radius: 12px;
 
-
-    div.innerHTML = `
-
-        <div>
-
-            <strong>
-                ${evaluacion.nombre}
-            </strong>
-
-            <span>
-                ${
-                    evaluacion.nota === null
-                        ? "Pendiente"
-                        : evaluacion.nota.toFixed(1).replace(".", ",")
-                }
-            </span>
-
-        </div>
-
-        <span>
-            ${evaluacion.ponderacion}%
-        </span>
-
-    `;
+    padding: 15px;
+}
 
 
-    lista.appendChild(div);
+.mensaje-advertencia {
+    background: #f8f0e2;
 
+    color: #9a7441;
+
+    border-radius: 12px;
+
+    padding: 15px;
+}
+
+
+.mensaje-peligro {
+    background: #f7e8e8;
+
+    color: #9a5b5b;
+
+    border-radius: 12px;
+
+    padding: 15px;
 }
 
 
 /* =========================================================
-   TOTALES
+   RESULTADO PRINCIPAL
 ========================================================= */
 
-function actualizarTotalesEvaluaciones() {
+.resultado-principal {
+    text-align: center;
 
-    const generales =
-        evaluacionesTemporales.filter(
-            e => e.tipo === "general"
-        );
-
-
-    const teoria =
-        evaluacionesTemporales.filter(
-            e => e.tipo === "teoria"
-        );
-
-
-    const laboratorio =
-        evaluacionesTemporales.filter(
-            e => e.tipo === "laboratorio"
-        );
-
-
-    mostrarTotal(
-        "total-ponderaciones",
-        generales
-    );
-
-
-    mostrarTotal(
-        "total-teoria",
-        teoria
-    );
-
-
-    mostrarTotal(
-        "total-laboratorio",
-        laboratorio
-    );
-
+    padding:
+        32px 25px;
 }
 
 
-function mostrarTotal(id, lista) {
+.resultado-principal h2 {
+    color: var(--texto-suave);
 
-    const elemento =
-        document.getElementById(id);
+    font-size: 1rem;
 
-
-    if (!elemento) return;
-
-
-    if (lista.length === 0) {
-
-        elemento.textContent = "";
-
-        return;
-
-    }
-
-
-    const total =
-        lista.reduce(
-            (suma, e) =>
-                suma + Number(e.ponderacion || 0),
-            0
-        );
-
-
-    elemento.textContent =
-        `Total: ${total}%`;
-
+    font-weight: 600;
 }
 
 
-/* =========================================================
-   GUARDAR CONFIGURACIÓN
-========================================================= */
+.promedio-grande {
+    margin:
+        5px 0 8px;
 
-function guardarConfiguracion() {
+    color: var(--color-principal-hover);
 
-    const notaMinima =
-        Number(
-            document.getElementById("nota-minima").value
-        );
+    font-size: clamp(3rem, 8vw, 4.5rem);
 
+    font-weight: 800;
 
-    if (
-        notaMinima < 1 ||
-        notaMinima > 7
-    ) {
-
-        alert("Ingresa una nota mínima válida.");
-
-        return;
-
-    }
-
-
-    if (ramoActual.tieneLaboratorio) {
-
-        const teoria =
-            evaluacionesTemporales.filter(
-                e => e.tipo === "teoria"
-            );
-
-
-        const laboratorio =
-            evaluacionesTemporales.filter(
-                e => e.tipo === "laboratorio"
-            );
-
-
-        if (!validarTotal(teoria)) {
-
-            alert(
-                "Las evaluaciones de teoría deben sumar 100%."
-            );
-
-            return;
-
-        }
-
-
-        if (!validarTotal(laboratorio)) {
-
-            alert(
-                "Las evaluaciones de laboratorio deben sumar 100%."
-            );
-
-            return;
-
-        }
-
-    } else {
-
-        const generales =
-            evaluacionesTemporales.filter(
-                e => e.tipo === "general"
-            );
-
-
-        if (!validarTotal(generales)) {
-
-            alert(
-                "Las evaluaciones deben sumar 100%."
-            );
-
-            return;
-
-        }
-
-    }
-
-
-    ramoActual.evaluaciones =
-        [...evaluacionesTemporales];
-
-
-    ramoActual.notaMinima =
-        notaMinima;
-
-
-    ramoActual.porcentajePresentacion =
-        70;
-
-
-    ramoActual.porcentajeExamen =
-        30;
-
-
-    ramos.push(ramoActual);
-
-
-    guardarRamos();
-
-
-    cargarRamos();
-
-
-    abrirRamo(ramos.length - 1);
-
+    letter-spacing: -2px;
 }
 
 
-function validarTotal(lista) {
+#estado-ramo {
+    margin: 0;
 
-    const total =
-        lista.reduce(
-            (suma, e) =>
-                suma + Number(e.ponderacion || 0),
-            0
-        );
-
-
-    return total === 100;
-
-}
-
-
-/* =========================================================
-   ABRIR RAMO
-========================================================= */
-
-function abrirRamo(indice) {
-
-    ramoActual = ramos[indice];
-
-    ramoActual._indice = indice;
-
-
-    mostrarPantalla("pantalla-ramo");
-
-
-    renderizarRamo();
-
-}
-
-
-function renderizarRamo() {
-
-    if (!ramoActual) return;
-
-
-    document.getElementById("titulo-ramo")
-        .textContent = ramoActual.nombre;
-
-
-    const promedio =
-        calcularPromedioRamo(ramoActual);
-
-
-    const promedioElemento =
-        document.getElementById("promedio-actual");
-
-
-    promedioElemento.textContent =
-        promedio === null
-            ? "—"
-            : promedio.toFixed(1).replace(".", ",");
-
-
-    actualizarEstadoRamo(promedio);
-
-
-    renderizarResumenEvaluaciones();
-
-
-    calcularObjetivo();
-
-
-}
-
-
-/* =========================================================
-   PROMEDIO
-========================================================= */
-
-function obtenerNotaEvaluacion(evaluacion) {
-
-    if (
-        evaluacion.subnotas &&
-        evaluacion.subnotas.length > 0
-    ) {
-
-        const total =
-            evaluacion.subnotas.reduce(
-                (suma, subnota) => {
-
-                    if (
-                        subnota.nota === null ||
-                        subnota.nota === undefined
-                    ) {
-
-                        return suma;
-
-                    }
-
-
-                    return suma +
-                        subnota.nota *
-                        (subnota.ponderacion / 100);
-
-                },
-                0
-            );
-
-
-        return total;
-
-    }
-
-
-    return evaluacion.nota;
-
-}
-
-
-function calcularPromedioRamo(ramo) {
-
-    if (!ramo || !ramo.evaluaciones) {
-
-        return null;
-
-    }
-
-
-    let suma = 0;
-
-    let pesoConNota = 0;
-
-
-    ramo.evaluaciones.forEach(evaluacion => {
-
-        const nota =
-            obtenerNotaEvaluacion(evaluacion);
-
-
-        if (
-            nota !== null &&
-            nota !== undefined &&
-            !isNaN(nota)
-        ) {
-
-            suma +=
-                nota *
-                (evaluacion.ponderacion / 100);
-
-
-            pesoConNota +=
-                evaluacion.ponderacion;
-
-        }
-
-    });
-
-
-    if (pesoConNota === 0) {
-
-        return null;
-
-    }
-
-
-    return suma / (pesoConNota / 100);
-
-}
-
-
-/* =========================================================
-   ESTADO DEL RAMO
-========================================================= */
-
-function actualizarEstadoRamo(promedio) {
-
-    const elemento =
-        document.getElementById("estado-ramo");
-
-
-    if (promedio === null) {
-
-        elemento.textContent =
-            "Aún no hay suficientes notas.";
-
-        return;
-
-    }
-
-
-    if (promedio >= ramoActual.notaMinima) {
-
-        elemento.textContent =
-            "Vas bien. Actualmente estás sobre la nota mínima.";
-
-    } else {
-
-        elemento.textContent =
-            "Todavía estás bajo la nota mínima.";
-
-    }
-
-}
-
-
-/* =========================================================
-   RESUMEN EVALUACIONES
-========================================================= */
-
-function renderizarResumenEvaluaciones() {
-
-    const contenedor =
-        document.getElementById(
-            "resumen-evaluaciones"
-        );
-
-
-    contenedor.innerHTML = "";
-
-
-    ramoActual.evaluaciones.forEach(evaluacion => {
-
-        const div =
-            document.createElement("div");
-
-
-        div.className =
-            "evaluacion-item";
-
-
-        const nota =
-            obtenerNotaEvaluacion(evaluacion);
-
-
-        div.innerHTML = `
-
-            <div>
-
-                <strong>
-                    ${evaluacion.nombre}
-                </strong>
-
-                <span>
-                    ${
-                        nota === null
-                            ? "Pendiente"
-                            : nota.toFixed(1).replace(".", ",")
-                    }
-                </span>
-
-            </div>
-
-            <span>
-                ${evaluacion.ponderacion}%
-            </span>
-
-        `;
-
-
-        contenedor.appendChild(div);
-
-    });
-
-}
-
-
-/* =========================================================
-   OBJETIVO
-========================================================= */
-
-function cambiarObjetivo() {
-
-    const otro =
-        document.querySelector(
-            'input[name="objetivo"][value="otro"]'
-        );
-
-
-    const campo =
-        document.getElementById(
-            "campo-otro-objetivo"
-        );
-
-
-    if (otro.checked) {
-
-        campo.classList.remove("oculto");
-
-    } else {
-
-        campo.classList.add("oculto");
-
-        calcularObjetivo();
-
-    }
-
-}
-
-
-function calcularObjetivo() {
-
-    if (!ramoActual) return;
-
-
-    const seleccion =
-        document.querySelector(
-            'input[name="objetivo"]:checked'
-        );
-
-
-    let objetivo =
-        ramoActual.notaMinima;
-
-
-    if (
-        seleccion &&
-        seleccion.value === "otro"
-    ) {
-
-        objetivo =
-            Number(
-                document.getElementById(
-                    "otro-objetivo"
-                ).value
-            );
-
-
-        if (
-            !objetivo ||
-            objetivo < 1 ||
-            objetivo > 7
-        ) {
-
-            document.getElementById(
-                "resultado-objetivo"
-            ).textContent = "";
-
-            return;
-
-        }
-
-    }
-
-
-    calcularNotaNecesaria(
-        objetivo,
-        "resultado-objetivo"
-    );
-
-}
-
-
-function calcularNotaNecesaria(
-    objetivo,
-    elementoId
-) {
-
-    const contenedor =
-        document.getElementById(elementoId);
-
-
-    if (!contenedor) return;
-
-
-    const promedio =
-        calcularPromedioRamo(ramoActual);
-
-
-    if (promedio === null) {
-
-        contenedor.innerHTML =
-            "<p>Ingresa al menos una nota para calcularlo.</p>";
-
-        return;
-
-    }
-
-
-    if (promedio >= objetivo) {
-
-        contenedor.innerHTML = `
-            <p>
-                Ya alcanzaste tu objetivo.
-            </p>
-        `;
-
-        return;
-
-    }
-
-
-    contenedor.innerHTML = `
-
-        <p>
-            Actualmente tienes un promedio de
-            <strong>
-                ${promedio.toFixed(1).replace(".", ",")}
-            </strong>.
-        </p>
-
-        <p>
-            Todavía necesitas mejorar tu promedio
-            para alcanzar
-            <strong>
-                ${objetivo.toFixed(1).replace(".", ",")}
-            </strong>.
-        </p>
-
-    `;
-
-}
-
-
-/* =========================================================
-   PAR
-========================================================= */
-
-function mostrarPAR(mostrar) {
-
-    const contenido =
-        document.getElementById(
-            "contenido-par"
-        );
-
-
-    if (mostrar) {
-
-        contenido.classList.remove("oculto");
-
-        renderizarNotasReemplazables();
-
-    } else {
-
-        contenido.classList.add("oculto");
-
-    }
-
-}
-
-
-function renderizarNotasReemplazables() {
-
-    const contenedor =
-        document.getElementById(
-            "notas-reemplazables"
-        );
-
-
-    contenedor.innerHTML = "";
-
-
-    ramoActual.evaluaciones.forEach(
-        (evaluacion, indice) => {
-
-            if (
-                evaluacion.nota === null ||
-                evaluacion.nota === undefined
-            ) return;
-
-
-            const boton =
-                document.createElement("button");
-
-
-            boton.className =
-                "opcion";
-
-
-            boton.textContent =
-                `${evaluacion.nombre}: ${
-                    evaluacion.nota
-                        .toFixed(1)
-                        .replace(".", ",")
-                }`;
-
-
-            boton.onclick = () => {
-
-                calcularPAR(indice);
-
-            };
-
-
-            contenedor.appendChild(boton);
-
-        }
-    );
-
-}
-
-
-function calcularPAR(indice) {
-
-    const evaluacion =
-        ramoActual.evaluaciones[indice];
-
-
-    const objetivo =
-        ramoActual.notaMinima;
-
-
-    const peso =
-        evaluacion.ponderacion / 100;
-
-
-    const promedioSin =
-        calcularPromedioSinEvaluacion(
-            indice
-        );
-
-
-    const notaNecesaria =
-        (
-            objetivo -
-            promedioSin
-        ) / peso;
-
-
-    const resultado =
-        document.getElementById(
-            "resultado-par"
-        );
-
-
-    if (notaNecesaria <= 1) {
-
-        resultado.innerHTML =
-            "<p>Con un 1,0 ya alcanzarías el objetivo.</p>";
-
-    } else if (notaNecesaria > 7) {
-
-        resultado.innerHTML =
-            "<p>Ni siquiera con un 7,0 alcanzarías el objetivo.</p>";
-
-    } else {
-
-        resultado.innerHTML = `
-
-            <p>
-                Necesitarías aproximadamente
-                <strong>
-                    ${notaNecesaria.toFixed(1).replace(".", ",")}
-                </strong>
-                en la PAR.
-            </p>
-
-        `;
-
-    }
-
-}
-
-
-function calcularPromedioSinEvaluacion(indice) {
-
-    let suma = 0;
-
-
-    ramoActual.evaluaciones.forEach(
-        (evaluacion, i) => {
-
-            if (i === indice) return;
-
-
-            const nota =
-                obtenerNotaEvaluacion(
-                    evaluacion
-                );
-
-
-            if (nota !== null) {
-
-                suma +=
-                    nota *
-                    (evaluacion.ponderacion / 100);
-
-            }
-
-        }
-    );
-
-
-    return suma;
-
+    color: var(--texto-suave);
 }
 
 
@@ -1649,198 +879,348 @@ function calcularPromedioSinEvaluacion(indice) {
    EXAMEN
 ========================================================= */
 
-function calcularExamen() {
+.examen-configuracion {
+    display: grid;
 
-    const promedio =
-        calcularPromedioRamo(ramoActual);
+    grid-template-columns:
+        repeat(2, 1fr);
 
-
-    if (promedio === null) return;
-
-
-    const porcentajePresentacion =
-        Number(
-            document.getElementById(
-                "porcentaje-presentacion"
-            ).value
-        );
+    gap: 18px;
+}
 
 
-    const porcentajeExamen =
-        Number(
-            document.getElementById(
-                "porcentaje-examen"
-            ).value
-        );
+.examen-configuracion > div {
+    position: relative;
+}
 
 
-    if (
-        porcentajePresentacion +
-        porcentajeExamen !== 100
-    ) {
+.examen-configuracion span {
+    position: absolute;
 
-        return;
+    right: 14px;
 
-    }
+    bottom: 29px;
 
+    color: var(--texto-suave);
 
-    const notaNecesaria =
-        (
-            ramoActual.notaMinima -
-            promedio *
-            (porcentajePresentacion / 100)
-        ) /
-        (porcentajeExamen / 100);
+    font-weight: 600;
+}
 
 
-    const resultado =
-        document.getElementById(
-            "resultado-examen"
-        );
-
-
-    if (notaNecesaria <= 1) {
-
-        resultado.textContent =
-            "Con un 1,0 en el examen ya alcanzarías la nota mínima.";
-
-    } else if (notaNecesaria > 7) {
-
-        resultado.textContent =
-            "Necesitarías más de un 7,0 para alcanzar la nota mínima.";
-
-    } else {
-
-        resultado.textContent =
-            `Necesitas aproximadamente un ${
-                notaNecesaria
-                    .toFixed(1)
-                    .replace(".", ",")
-            } en el examen.`;
-
-    }
-
+.resultado-examen {
+    line-height: 1.7;
 }
 
 
 /* =========================================================
-   EDITAR RAMO
+   ZONA PELIGRO
 ========================================================= */
 
-function editarRamo() {
+.zona-peligro {
+    margin-top: 35px;
 
-    alert(
-        "La edición completa del ramo estará disponible próximamente."
-    );
+    padding-top: 25px;
 
+    border-top:
+        1px solid var(--borde);
+
+    text-align: right;
 }
 
 
 /* =========================================================
-   NAVEGACIÓN ATRÁS
+   MODALES
 ========================================================= */
 
-function volverMisRamos() {
+.modal {
+    position: fixed;
 
-    cerrarPaneles();
+    inset: 0;
 
-    mostrarPantalla("pantalla-inicio");
+    z-index: 1000;
 
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 20px;
+
+    background:
+        rgba(45, 38, 50, 0.35);
+
+    backdrop-filter: blur(4px);
 }
 
 
-function volverNuevoRamo() {
+.modal-contenido {
+    width: min(560px, 100%);
 
-    mostrarPantalla(
-        "pantalla-nuevo-ramo"
-    );
+    max-height: 90vh;
 
+    overflow-y: auto;
+
+    background: var(--fondo-tarjeta);
+
+    border-radius: 20px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 20px 60px rgba(30, 20, 40, 0.2);
 }
 
 
-function volverLaboratorio() {
-
-    mostrarPantalla(
-        "pantalla-laboratorio"
-    );
-
+.modal-contenido h2 {
+    margin:
+        0 0 22px;
 }
 
 
-function volverAnteriorConfiguracion() {
+.modal-botones {
+    display: flex;
 
-    if (
-        ramoActual &&
-        ramoActual.tieneLaboratorio
-    ) {
+    justify-content: flex-end;
 
-        mostrarPantalla(
-            "pantalla-division"
-        );
+    gap: 10px;
 
-    } else {
-
-        mostrarPantalla(
-            "pantalla-laboratorio"
-        );
-
-    }
-
+    margin-top: 22px;
 }
 
 
 /* =========================================================
-   ELIMINAR RAMO
+   OCULTO
 ========================================================= */
 
-function confirmarEliminarRamo() {
-
-    if (!ramoActual) return;
-
-
-    const confirmar =
-        confirm(
-            `¿Seguro que quieres eliminar "${ramoActual.nombre}"?`
-        );
-
-
-    if (!confirmar) return;
-
-
-    ramos =
-        ramos.filter(
-            ramo =>
-                ramo !== ramoActual
-        );
-
-
-    guardarRamos();
-
-
-    ramoActual = null;
-
-
-    cargarRamos();
-
-
-    mostrarPantalla(
-        "pantalla-inicio"
-    );
-
+.oculto {
+    display: none !important;
 }
 
 
 /* =========================================================
-   LOCAL STORAGE
+   MENÚ
 ========================================================= */
 
-function guardarRamos() {
+.boton-menu {
+    position: fixed;
 
-    localStorage.setItem(
-        "ramos",
-        JSON.stringify(ramos)
-    );
+    top: 22px;
 
+    left: 22px;
+
+    z-index: 900;
+
+    width: 46px;
+
+    height: 46px;
+
+    border: 1px solid var(--borde);
+
+    border-radius: 14px;
+
+    background: var(--fondo-tarjeta);
+
+    color: var(--texto);
+
+    font-size: 1.35rem;
+
+    box-shadow: var(--sombra);
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.boton-menu:hover {
+    transform: translateY(-2px);
+
+    background: var(--color-secundario);
+}
+
+
+.menu-lateral {
+    position: fixed;
+
+    top: 0;
+
+    left: 0;
+
+    z-index: 1100;
+
+    width: min(310px, 85vw);
+
+    height: 100vh;
+
+    background: var(--fondo-tarjeta);
+
+    border-right:
+        1px solid var(--borde);
+
+    box-shadow:
+        10px 0 35px rgba(40, 30, 50, 0.1);
+
+    transform: translateX(-105%);
+
+    transition:
+        transform 0.25s ease;
+
+    display: flex;
+
+    flex-direction: column;
+}
+
+
+.menu-lateral.abierto {
+    transform: translateX(0);
+}
+
+
+.menu-encabezado {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 15px;
+
+    padding:
+        25px 22px;
+
+    border-bottom:
+        1px solid var(--borde);
+}
+
+
+.menu-encabezado h2 {
+    margin: 0;
+
+    font-size: 1rem;
+}
+
+
+.cerrar-menu {
+    width: 34px;
+
+    height: 34px;
+
+    border: 0;
+
+    border-radius: 10px;
+
+    background: var(--color-secundario);
+
+    color: var(--texto);
+
+    font-size: 1.4rem;
+}
+
+
+.menu-navegacion {
+    padding: 18px 12px;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 5px;
+}
+
+
+.menu-navegacion button {
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    width: 100%;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    background: transparent;
+
+    color: var(--texto);
+
+    padding:
+        13px 14px;
+
+    text-align: left;
+
+    font-weight: 600;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.menu-navegacion button span {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 25px;
+
+    color: var(--color-principal-hover);
+
+    font-size: 1.1rem;
+}
+
+
+.menu-navegacion button:hover {
+    background: var(--color-secundario);
+
+    color: var(--color-principal-hover);
+}
+
+
+.menu-version {
+    margin-top: auto;
+
+    padding:
+        18px 22px;
+
+    border-top:
+        1px solid var(--borde);
+
+    color: var(--texto-suave);
+
+    font-size: 0.82rem;
+}
+
+
+.fondo-menu {
+    position: fixed;
+
+    inset: 0;
+
+    z-index: 1050;
+
+    background:
+        rgba(40, 32, 45, 0.25);
+
+    backdrop-filter: blur(2px);
+
+    opacity: 0;
+
+    visibility: hidden;
+
+    transition:
+        opacity 0.25s ease;
+}
+
+
+.fondo-menu.activo {
+    opacity: 1;
+
+    visibility: visible;
 }
 
 
@@ -1848,66 +1228,280 @@ function guardarRamos() {
    TEMAS
 ========================================================= */
 
-function cambiarTema(tema) {
+.temas {
+    display: grid;
 
-    document.body.dataset.tema =
-        tema;
+    grid-template-columns:
+        repeat(2, 1fr);
 
-
-    localStorage.setItem(
-        "tema",
-        tema
-    );
-
+    gap: 12px;
 }
 
 
-function cargarTema() {
+.tema-opcion {
+    display: flex;
 
-    const tema =
-        localStorage.getItem("tema") ||
-        "lila";
+    align-items: center;
+
+    gap: 12px;
+
+    border:
+        1px solid var(--borde);
+
+    border-radius: 13px;
+
+    background: var(--fondo-tarjeta);
+
+    padding: 15px;
+
+    color: var(--texto);
+
+    font-weight: 600;
+
+    text-align: left;
+
+    transition:
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
 
 
-    document.body.dataset.tema =
-        tema;
+.tema-opcion:hover {
+    border-color: var(--color-principal);
 
+    transform: translateY(-2px);
+}
+
+
+.tema-color {
+    width: 25px;
+
+    height: 25px;
+
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    border: 3px solid white;
+
+    box-shadow:
+        0 0 0 1px var(--borde);
+}
+
+
+.tema-color.lila {
+    background: #a98bd4;
+}
+
+
+.tema-color.verde {
+    background: #91b69b;
+}
+
+
+.tema-color.celeste {
+    background: #8eb8d2;
+}
+
+
+.tema-color.rosa {
+    background: #d69aaa;
 }
 
 
 /* =========================================================
-   MENÚ DE TEMAS
+   HISTORIAL DE VERSIONES
 ========================================================= */
 
-function aplicarTemaYMostrar(tema) {
+.historial-versiones {
+    position: relative;
 
-    cambiarTema(tema);
+    display: flex;
 
+    flex-direction: column;
+
+    gap: 14px;
+}
+
+
+.version-item {
+    position: relative;
+
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 18px;
+
+    padding: 20px;
+
+    background: var(--fondo-tarjeta);
+
+    border:
+        1px solid var(--borde);
+
+    border-radius: 15px;
+
+    box-shadow:
+        0 4px 15px rgba(60, 45, 75, 0.045);
+}
+
+
+.version-item.actual {
+    border-color: var(--color-principal);
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--color-secundario),
+            var(--fondo-tarjeta)
+        );
+}
+
+
+.version-numero {
+    flex-shrink: 0;
+
+    padding:
+        7px 11px;
+
+    border-radius: 9px;
+
+    background: var(--color-principal);
+
+    color: white;
+
+    font-size: 0.85rem;
+
+    font-weight: 750;
+}
+
+
+.version-info h2 {
+    margin:
+        1px 0 6px;
+
+    font-size: 1rem;
+}
+
+
+.version-info p {
+    margin: 0;
+
+    color: var(--texto-suave);
+
+    font-size: 0.9rem;
+
+    line-height: 1.5;
 }
 
 
 /* =========================================================
-   VERSIÓN
+   WATERMARK
 ========================================================= */
 
-const VERSION_ACTUAL = "v1.0";
+.watermark {
+    position: fixed;
+
+    right: 18px;
+
+    bottom: 12px;
+
+    z-index: 20;
+
+    color: var(--texto-suave);
+
+    font-size: 0.72rem;
+
+    opacity: 0.7;
+
+    pointer-events: none;
+}
 
 
 /* =========================================================
-   TECLADO
+   RESPONSIVE
 ========================================================= */
 
-document.addEventListener(
-    "keydown",
-    event => {
+@media (max-width: 700px) {
 
-        if (event.key === "Escape") {
-
-            cerrarMenu();
-
-            cerrarPanelMenu();
-
-        }
-
+    .encabezado-principal {
+        padding-top: 85px;
     }
-);
+
+
+    .titulo-seccion {
+        align-items: stretch;
+
+        flex-direction: column;
+    }
+
+
+    .boton-agregar {
+        width: 100%;
+    }
+
+
+    .examen-configuracion {
+        grid-template-columns: 1fr;
+    }
+
+
+    .temas {
+        grid-template-columns: 1fr;
+    }
+
+
+    .version-item {
+        gap: 12px;
+    }
+
+
+    .version-numero {
+        font-size: 0.75rem;
+    }
+
+}
+
+
+@media (max-width: 480px) {
+
+    .contenido,
+    .contenido-centrado,
+    .seccion-ramos {
+        width: min(100% - 28px, 1000px);
+    }
+
+
+    .barra-superior {
+        width: calc(100% - 28px);
+    }
+
+
+    .tarjeta {
+        padding: 19px;
+    }
+
+
+    .modal-contenido {
+        padding: 22px;
+    }
+
+
+    .modal-botones {
+        flex-direction: column-reverse;
+    }
+
+
+    .modal-botones button {
+        width: 100%;
+    }
+
+
+    .opciones-radio {
+        flex-direction: column;
+
+        gap: 12px;
+    }
+
+}
