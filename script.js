@@ -3000,147 +3000,84 @@ document.addEventListener(
 
 function abrirMenu() {
 
-    const menu =
-        document.getElementById("menu-lateral");
+    document
+        .getElementById("menu-lateral")
+        .classList.add("abierto");
 
-    const fondo =
-        document.getElementById("fondo-menu");
-
-
-    menu.classList.add("abierto");
-
-    fondo.classList.add("activo");
+    document
+        .getElementById("fondo-menu")
+        .classList.add("activo");
 
 }
 
 
 function cerrarMenu() {
 
-    const menu =
-        document.getElementById("menu-lateral");
+    document
+        .getElementById("menu-lateral")
+        .classList.remove("abierto");
 
-    const fondo =
-        document.getElementById("fondo-menu");
-
-
-    menu.classList.remove("abierto");
-
-    fondo.classList.remove("activo");
+    document
+        .getElementById("fondo-menu")
+        .classList.remove("activo");
 
 }
 
 
-function irDesdeMenu(pantalla) {
+/* =========================================================
+   NAVEGACIÓN DEL MENÚ
+========================================================= */
+
+function irAMisRamos() {
 
     cerrarMenu();
 
-    setTimeout(() => {
-
-        mostrarPantalla(pantalla);
-
-    }, 180);
-
-}
-
-/* =========================================================
-   TEMAS
-========================================================= */
-
-function cambiarTema(tema) {
-
-    document.body.dataset.tema = tema;
-
-    localStorage.setItem(
-        "temaCalculadora",
-        tema
+    mostrarPantalla(
+        "pantalla-inicio"
     );
 
 }
 
 
-function cargarTema() {
+function irComoFunciona() {
 
-    const tema =
-        localStorage.getItem(
-            "temaCalculadora"
-        ) || "lila";
+    cerrarMenu();
 
-
-    document.body.dataset.tema =
-        tema;
-
-}
-
-
-/* =========================================================
-   SUGERENCIAS
-========================================================= */
-
-function enviarSugerencia() {
-
-    const tipo =
-        document.getElementById(
-            "tipo-sugerencia"
-        ).value;
-
-    const ramo =
-        document.getElementById(
-            "ramo-sugerencia"
-        ).value.trim();
-
-    const mensaje =
-        document.getElementById(
-            "mensaje-sugerencia"
-        ).value.trim();
-
-
-    if (!tipo || !mensaje) {
-
-        alert(
-            "Completa el tipo de sugerencia y el mensaje."
-        );
-
-        return;
-
-    }
-
-
-    /*
-        Por ahora dejamos la función preparada.
-        Más adelante podemos conectarla con
-        Supabase o el sistema que decidamos.
-    */
-
-
-    alert(
-        "¡Gracias por tu sugerencia!"
+    mostrarPantalla(
+        "pantalla-como-funciona"
     );
 
+}
 
-    document.getElementById(
-        "tipo-sugerencia"
-    ).value = "";
 
-    document.getElementById(
-        "ramo-sugerencia"
-    ).value = "";
+function irSugerencias() {
 
-    document.getElementById(
-        "mensaje-sugerencia"
-    ).value = "";
+    cerrarMenu();
+
+    mostrarPantalla(
+        "pantalla-sugerencias"
+    );
 
 }
 
 
-/* =========================================================
-   INICIO DEL MENÚ
-========================================================= */
+function irTemas() {
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
+    cerrarMenu();
 
-        cargarTema();
+    mostrarPantalla(
+        "pantalla-temas"
+    );
 
-    }
-);
+}
+
+
+function irVersion() {
+
+    cerrarMenu();
+
+    mostrarPantalla(
+        "pantalla-version"
+    );
+
+}
