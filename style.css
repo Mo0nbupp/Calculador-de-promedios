@@ -1204,16 +1204,28 @@ input:disabled {
     z-index: 1050;
 
     background:
-        rgba(40, 32, 45, 0.25);
+        rgba(40, 32, 45, 0.18);
 
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(3px);
 
     opacity: 0;
 
     visibility: hidden;
 
+    pointer-events: none;
+
     transition:
-        opacity 0.25s ease;
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+
+.fondo-menu.activo {
+    opacity: 1;
+
+    visibility: visible;
+
+    pointer-events: auto;
 }
 
 
