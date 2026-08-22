@@ -1,1352 +1,4092 @@
-<!DOCTYPE html>
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Calculadora de Promedios</title>
-
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="favicon.png">
-</head>
-
-<body>
-
-    <!-- =====================================================
-         BOTÓN DEL MENÚ
-    ====================================================== -->
-
-    <button
-        id="boton-menu"
-        class="boton-menu"
-        onclick="abrirMenu()"
-        aria-label="Abrir menú"
-    >
-        ☰
-    </button>
+/* =========================================================
+   CALCULADORA DE PROMEDIOS
+   Versión 1.0
+========================================================= */
 
 
-    <!-- =====================================================
-         FONDO DEL MENÚ
-    ====================================================== -->
+/* =========================================================
+   DATOS
+========================================================= */
 
-    <div
-        id="fondo-menu"
-        class="fondo-menu"
-        onclick="cerrarMenu()"
-    ></div>
+let ramos =
+    JSON.parse(
+        localStorage.getItem("ramosCalculadora")
+    ) || [];
+
+let ramoActualId = null;
+
+let modoEdicion = false;
+
+let tipoEvaluacionActual = null;
 
 
-    <!-- =====================================================
-         MENÚ LATERAL
-    ====================================================== -->
+/* =========================================================
+   GUARDADO
+========================================================= */
 
-    <aside
-        id="menu-lateral"
-        class="menu-lateral"
-    >
+function guardarDatos() {
 
-        <div class="menu-encabezado">
+    localStorage.setItem(
+        "ramosCalculadora",
+        JSON.stringify(ramos)
+    );
 
-            <h2>Calculadora de Promedios</h2>
+}
 
-            <button
-                class="cerrar-menu"
-                onclick="cerrarMenu()"
-                aria-label="Cerrar menú"
+
+/* =========================================================
+   UTILIDADES
+========================================================= */
+
+function generarId() {
+
+    return (
+        Date.now().toString() +
+        Math.random()
+            .toString(36)
+            .substring(2, 8)
+    );
+
+}
+
+
+function obtenerRamoActual() {
+
+    return ramos.find(
+        ramo => ramo.id === ramoActualId
+    );
+
+}
+
+
+function redondear(numero) {
+
+    return Math.round(
+        numero * 100
+    ) / 100;
+
+}
+
+
+function formatearNumero(numero) {
+
+    if (
+        numero === null ||
+        numero === undefined ||
+        isNaN(numero)
+    ) {
+
+        return "—";
+
+    }
+
+    return Number(numero)
+        .toFixed(2)
+        .replace(".", ",");
+
+}
+
+
+function escaparHTML(texto) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = texto;
+
+    return div.innerHTML;
+
+}
+
+
+/* =========================================================
+   CAMBIO DE PANTALLAS
+========================================================= */
+
+function mostrarPantalla(id) {
+
+    document
+        .querySelectorAll(".pantalla")
+        .forEach(pantalla => {
+
+            pantalla.classList.remove(
+                "activa"
+            );
+
+        });
+
+
+    const pantalla =
+        document.getElementById(id);
+
+
+    if (pantalla) {
+
+        pantalla.classList.add(
+            "activa"
+        );
+
+    }
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+}
+
+
+/* =========================================================
+   MIS RAMOS
+========================================================= */
+
+function renderizarRamos() {
+
+    const contenedor =
+        document.getElementById(
+            "lista-ramos"
+        );
+
+
+    if (!contenedor) return;
+
+
+    if (!ramos.length) {
+
+        contenedor.innerHTML = `
+
+            <div class="sin-ramos">
+
+                <p>
+                    Todavía no tienes ramos guardados.
+                </p>
+
+                <span>
+                    Agrega tu primer ramo para comenzar.
+                </span>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    contenedor.innerHTML = "";
+
+
+    ramos.forEach(ramo => {
+
+        const promedio =
+            calcularPromedioRamo(ramo);
+
+
+        const card =
+            document.createElement("div");
+
+
+        card.className =
+            "ramo-card";
+
+
+        card.innerHTML = `
+
+            <h3>
+                ${escaparHTML(ramo.nombre)}
+            </h3>
+
+            <p>
+                ${escaparHTML(
+                    obtenerEstadoRamo(ramo)
+                )}
+            </p>
+
+            <div class="ramo-promedio">
+
+                ${
+                    promedio === null
+                        ? "—"
+                        : formatearNumero(promedio)
+                }
+
+            </div>
+
+        `;
+
+
+        card.addEventListener(
+            "click",
+            () => abrirRamo(ramo.id)
+        );
+
+
+        contenedor.appendChild(card);
+
+    });
+
+}
+
+
+/* =========================================================
+   CREAR RAMO
+========================================================= */
+
+function nuevoRamo() {
+
+    modoEdicion = false;
+
+    ramoActualId = null;
+
+
+    document.getElementById(
+        "nombre-nuevo-ramo"
+    ).value = "";
+
+
+    mostrarPantalla(
+        "pantalla-nuevo-ramo"
+    );
+
+}
+
+
+function guardarNombreRamo() {
+
+    const input =
+        document.getElementById(
+            "nombre-nuevo-ramo"
+        );
+
+
+    const nombre =
+        input.value.trim();
+
+
+    if (!nombre) {
+
+        alert(
+            "Escribe el nombre del ramo."
+        );
+
+        input.focus();
+
+        return;
+
+    }
+
+
+    /*
+        Si estamos editando, solamente
+        actualizamos el nombre.
+    */
+
+    if (modoEdicion) {
+
+        const ramo =
+            obtenerRamoActual();
+
+
+        if (!ramo) return;
+
+
+        ramo.nombre =
+            nombre;
+
+
+        guardarDatos();
+
+
+        prepararPantallaEvaluaciones();
+
+
+        mostrarPantalla(
+            "pantalla-evaluaciones"
+        );
+
+
+        return;
+
+    }
+
+
+    ramoActualId =
+        generarId();
+
+
+    const nuevoRamo = {
+
+        id:
+            ramoActualId,
+
+        nombre,
+
+        tieneLaboratorio:
+            false,
+
+        porcentajeTeoria:
+            100,
+
+        porcentajeLaboratorio:
+            0,
+
+        evaluaciones:
+            [],
+
+        evaluacionesTeoria:
+            [],
+
+        evaluacionesLaboratorio:
+            [],
+
+        notaMinima:
+            4,
+
+        tienePAR:
+            false,
+
+        porcentajePresentacion:
+            70,
+
+        porcentajeExamen:
+            30,
+
+        objetivo:
+            null
+
+    };
+
+
+    ramos.push(
+        nuevoRamo
+    );
+
+
+    guardarDatos();
+
+
+    mostrarPantalla(
+        "pantalla-laboratorio"
+    );
+
+}
+
+
+/* =========================================================
+   LABORATORIO
+========================================================= */
+
+function volverNuevoRamo() {
+
+    mostrarPantalla(
+        "pantalla-nuevo-ramo"
+    );
+
+}
+
+
+function seleccionarLaboratorio(
+    tieneLaboratorio
+) {
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (!ramo) return;
+
+
+    ramo.tieneLaboratorio =
+        tieneLaboratorio;
+
+
+    if (tieneLaboratorio) {
+
+        mostrarPantalla(
+            "pantalla-division"
+        );
+
+    } else {
+
+        ramo.porcentajeTeoria =
+            100;
+
+        ramo.porcentajeLaboratorio =
+            0;
+
+
+        prepararPantallaEvaluaciones();
+
+
+        mostrarPantalla(
+            "pantalla-evaluaciones"
+        );
+
+    }
+
+}
+
+
+function volverLaboratorio() {
+
+    mostrarPantalla(
+        "pantalla-laboratorio"
+    );
+
+}
+
+
+function guardarDivision() {
+
+    const teoria =
+        Number(
+            document.getElementById(
+                "porcentaje-teoria"
+            ).value
+        );
+
+
+    const laboratorio =
+        Number(
+            document.getElementById(
+                "porcentaje-laboratorio"
+            ).value
+        );
+
+
+    const mensaje =
+        document.getElementById(
+            "mensaje-division"
+        );
+
+
+    const total =
+        teoria + laboratorio;
+
+
+    if (
+        isNaN(teoria) ||
+        isNaN(laboratorio)
+    ) {
+
+        mensaje.className =
+            "mensaje-validacion mensaje-peligro";
+
+        mensaje.textContent =
+            "Ingresa ambos porcentajes.";
+
+        return;
+
+    }
+
+
+    if (
+        teoria < 0 ||
+        laboratorio < 0
+    ) {
+
+        mensaje.className =
+            "mensaje-validacion mensaje-peligro";
+
+        mensaje.textContent =
+            "Los porcentajes no pueden ser negativos.";
+
+        return;
+
+    }
+
+
+    if (total !== 100) {
+
+        mensaje.className =
+            "mensaje-validacion mensaje-advertencia";
+
+        mensaje.textContent =
+            `La división suma ${total}%. Debe sumar 100%.`;
+
+        return;
+
+    }
+
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (!ramo) return;
+
+
+    ramo.porcentajeTeoria =
+        teoria;
+
+    ramo.porcentajeLaboratorio =
+        laboratorio;
+
+
+    guardarDatos();
+
+
+    prepararPantallaEvaluaciones();
+
+
+    mostrarPantalla(
+        "pantalla-evaluaciones"
+    );
+
+}
+
+
+/* =========================================================
+   CONFIGURACIÓN DE EVALUACIONES
+========================================================= */
+
+function prepararPantallaEvaluaciones() {
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (!ramo) return;
+
+
+    const bloqueNormal =
+        document.getElementById(
+            "bloque-evaluaciones"
+        );
+
+
+    const bloqueTeoria =
+        document.getElementById(
+            "bloque-teoria"
+        );
+
+
+    const bloqueLaboratorio =
+        document.getElementById(
+            "bloque-laboratorio"
+        );
+
+
+    if (ramo.tieneLaboratorio) {
+
+        bloqueNormal.classList.add(
+            "oculto"
+        );
+
+        bloqueTeoria.classList.remove(
+            "oculto"
+        );
+
+        bloqueLaboratorio.classList.remove(
+            "oculto"
+        );
+
+
+        renderizarEvaluaciones(
+            ramo.evaluacionesTeoria,
+            "lista-teoria"
+        );
+
+
+        renderizarEvaluaciones(
+            ramo.evaluacionesLaboratorio,
+            "lista-laboratorio"
+        );
+
+
+        actualizarTotalPonderaciones(
+            ramo.evaluacionesTeoria,
+            "total-teoria"
+        );
+
+
+        actualizarTotalPonderaciones(
+            ramo.evaluacionesLaboratorio,
+            "total-laboratorio"
+        );
+
+    } else {
+
+        bloqueNormal.classList.remove(
+            "oculto"
+        );
+
+        bloqueTeoria.classList.add(
+            "oculto"
+        );
+
+        bloqueLaboratorio.classList.add(
+            "oculto"
+        );
+
+
+        renderizarEvaluaciones(
+            ramo.evaluaciones,
+            "lista-evaluaciones"
+        );
+
+
+        actualizarTotalPonderaciones(
+            ramo.evaluaciones,
+            "total-ponderaciones"
+        );
+
+    }
+
+
+    document.getElementById(
+        "nota-minima"
+    ).value =
+        ramo.notaMinima ?? 4;
+
+}
+
+
+/* =========================================================
+   AGREGAR EVALUACIÓN
+========================================================= */
+
+function agregarEvaluacion(
+    tipo = null
+) {
+
+    tipoEvaluacionActual =
+        tipo;
+
+
+    document.getElementById(
+        "nombre-evaluacion"
+    ).value = "";
+
+
+    document.getElementById(
+        "nota-evaluacion"
+    ).value = "";
+
+
+    document.getElementById(
+        "ponderacion-evaluacion"
+    ).value = "";
+
+
+    document.getElementById(
+        "nota-pendiente"
+    ).checked = false;
+
+
+    const radioNo =
+        document.querySelector(
+            'input[name="tiene-subnotas"][value="no"]'
+        );
+
+
+    if (radioNo) {
+
+        radioNo.checked = true;
+
+    }
+
+
+    document.getElementById(
+        "seccion-subnotas"
+    ).classList.add(
+        "oculto"
+    );
+
+
+    document.getElementById(
+        "lista-subnotas"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+        "total-subnotas"
+    ).textContent = "";
+
+
+    cambiarEstadoNota();
+
+
+    document.getElementById(
+        "modal-evaluacion"
+    ).classList.remove(
+        "oculto"
+    );
+
+}
+
+
+function cerrarModalEvaluacion() {
+
+    document.getElementById(
+        "modal-evaluacion"
+    ).classList.add(
+        "oculto"
+    );
+
+}
+
+
+function cambiarEstadoNota() {
+
+    const pendiente =
+        document.getElementById(
+            "nota-pendiente"
+        ).checked;
+
+
+    const nota =
+        document.getElementById(
+            "nota-evaluacion"
+        );
+
+
+    nota.disabled =
+        pendiente;
+
+
+    if (pendiente) {
+
+        nota.value = "";
+
+    }
+
+}
+
+
+/* =========================================================
+   SUBNOTAS
+========================================================= */
+
+function mostrarSubnotas(
+    mostrar
+) {
+
+    const seccion =
+        document.getElementById(
+            "seccion-subnotas"
+        );
+
+
+    if (mostrar) {
+
+        seccion.classList.remove(
+            "oculto"
+        );
+
+    } else {
+
+        seccion.classList.add(
+            "oculto"
+        );
+
+
+        document.getElementById(
+            "lista-subnotas"
+        ).innerHTML = "";
+
+
+        document.getElementById(
+            "total-subnotas"
+        ).textContent = "";
+
+    }
+
+}
+
+
+function agregarSubnota() {
+
+    const lista =
+        document.getElementById(
+            "lista-subnotas"
+        );
+
+
+    const div =
+        document.createElement("div");
+
+
+    div.className =
+        "evaluacion-card";
+
+
+    div.dataset.id =
+        generarId();
+
+
+    div.innerHTML = `
+
+        <label>
+            Nombre
+        </label>
+
+        <input
+            type="text"
+            class="subnota-nombre"
+            placeholder="Ej: Prueba escrita"
+        >
+
+
+        <label>
+            Nota
+        </label>
+
+        <input
+            type="number"
+            class="subnota-nota"
+            placeholder="Ej: 5,5"
+            min="1"
+            max="7"
+            step="0.1"
+        >
+
+
+        <label class="checkbox">
+
+            <input
+                type="checkbox"
+                class="subnota-pendiente"
             >
-                ×
-            </button>
 
-        </div>
+            Aún no tengo esta nota
 
-
-        <nav class="menu-navegacion">
-
-            <button onclick="irAMisRamos()">
-
-                <span>⌂</span>
-
-                <span class="texto-menu">
-                    Mis ramos
-                </span>
-
-            </button>
+        </label>
 
 
-            <button onclick="irComoFunciona()">
+        <label>
+            Ponderación
+        </label>
 
-                <span>?</span>
-
-                <span class="texto-menu">
-                    Cómo funciona
-                </span>
-
-            </button>
-
-
-            <button onclick="irSugerencias()">
-
-                <span>✦</span>
-
-                <span class="texto-menu">
-                    Sugerencias
-                </span>
-
-            </button>
-
-
-            <button onclick="irTemas()">
-
-                <span>◐</span>
-
-                <span class="texto-menu">
-                    Temas
-                </span>
-
-            </button>
-
-
-            <button onclick="irVersion()">
-
-                <span>▣</span>
-
-                <span class="texto-menu">
-                    Versión
-                </span>
-
-            </button>
-
-        </nav>
-
-
-        <div class="menu-version">
-            v1.0
-        </div>
-
-    </aside>
-
-
-
-    <!-- =====================================================
-         APP
-    ====================================================== -->
-
-    <main class="app">
-
-
-        <!-- =================================================
-             INICIO / MIS RAMOS
-        ================================================== -->
-
-        <section
-            id="pantalla-inicio"
-            class="pantalla activa"
+        <input
+            type="number"
+            class="subnota-ponderacion"
+            placeholder="Ej: 50"
+            min="0"
+            max="100"
         >
 
-            <header class="encabezado-principal">
+    `;
 
-                <h1>Calculadora de Promedios</h1>
+
+    lista.appendChild(
+        div
+    );
+
+
+    const ponderacion =
+        div.querySelector(
+            ".subnota-ponderacion"
+        );
+
+
+    ponderacion.addEventListener(
+        "input",
+        actualizarTotalSubnotas
+    );
+
+
+    actualizarTotalSubnotas();
+
+}
+
+
+function actualizarTotalSubnotas() {
+
+    const elementos =
+        document.querySelectorAll(
+            "#lista-subnotas .evaluacion-card"
+        );
+
+
+    let total = 0;
+
+
+    elementos.forEach(
+        elemento => {
+
+            const valor =
+                Number(
+                    elemento.querySelector(
+                        ".subnota-ponderacion"
+                    ).value
+                );
+
+
+            if (!isNaN(valor)) {
+
+                total += valor;
+
+            }
+
+        }
+    );
+
+
+    const mensaje =
+        document.getElementById(
+            "total-subnotas"
+        );
+
+
+    if (!mensaje) return;
+
+
+    if (total === 100) {
+
+        mensaje.className =
+            "mensaje-validacion mensaje-exito";
+
+        mensaje.textContent =
+            "Ponderación configurada: 100% ✓";
+
+    } else if (total < 100) {
+
+        mensaje.className =
+            "mensaje-validacion mensaje-advertencia";
+
+        mensaje.textContent =
+            `Ponderación configurada: ${total}%. Aún falta asignar ${100 - total}%.`;
+
+    } else {
+
+        mensaje.className =
+            "mensaje-validacion mensaje-peligro";
+
+        mensaje.textContent =
+            `Ponderación configurada: ${total}%. Revisa las ponderaciones ingresadas.`;
+
+    }
+
+}
+
+
+/* =========================================================
+   GUARDAR EVALUACIÓN
+========================================================= */
+
+function guardarEvaluacion() {
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (!ramo) return;
+
+
+    const nombre =
+        document.getElementById(
+            "nombre-evaluacion"
+        ).value.trim();
+
+
+    const pendiente =
+        document.getElementById(
+            "nota-pendiente"
+        ).checked;
+
+
+    const nota =
+        pendiente
+            ? null
+            : Number(
+                document.getElementById(
+                    "nota-evaluacion"
+                ).value
+            );
+
+
+    const ponderacion =
+        Number(
+            document.getElementById(
+                "ponderacion-evaluacion"
+            ).value
+        );
+
+
+    if (!nombre) {
+
+        alert(
+            "Escribe el nombre de la evaluación."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        !pendiente &&
+        (
+            isNaN(nota) ||
+            nota < 1 ||
+            nota > 7
+        )
+    ) {
+
+        alert(
+            "Ingresa una nota válida entre 1,0 y 7,0."
+        );
+
+        return;
+
+    }
+
+
+    if (
+        isNaN(ponderacion) ||
+        ponderacion <= 0 ||
+        ponderacion > 100
+    ) {
+
+        alert(
+            "Ingresa una ponderación válida."
+        );
+
+        return;
+
+    }
+
+
+    const radioSubnotas =
+        document.querySelector(
+            'input[name="tiene-subnotas"]:checked'
+        );
+
+
+    const tieneSubnotas =
+        radioSubnotas &&
+        radioSubnotas.value === "si";
+
+
+    let subnotas = [];
+
+
+    if (tieneSubnotas) {
+
+        const elementos =
+            document.querySelectorAll(
+                "#lista-subnotas .evaluacion-card"
+            );
+
+
+        if (!elementos.length) {
+
+            alert(
+                "Agrega al menos una subnota."
+            );
+
+            return;
+
+        }
+
+
+        let totalSubnotas = 0;
+
+
+        for (
+            const elemento of elementos
+        ) {
+
+            const nombreSubnota =
+                elemento.querySelector(
+                    ".subnota-nombre"
+                ).value.trim();
+
+
+            const pendienteSubnota =
+                elemento.querySelector(
+                    ".subnota-pendiente"
+                ).checked;
+
+
+            const notaSubnota =
+                pendienteSubnota
+                    ? null
+                    : Number(
+                        elemento.querySelector(
+                            ".subnota-nota"
+                        ).value
+                    );
+
+
+            const ponderacionSubnota =
+                Number(
+                    elemento.querySelector(
+                        ".subnota-ponderacion"
+                    ).value
+                );
+
+
+            if (!nombreSubnota) {
+
+                alert(
+                    "Todas las subnotas necesitan un nombre."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !pendienteSubnota &&
+                (
+                    isNaN(notaSubnota) ||
+                    notaSubnota < 1 ||
+                    notaSubnota > 7
+                )
+            ) {
+
+                alert(
+                    "Hay una subnota con una nota inválida."
+                );
+
+                return;
+
+            }
+
+
+            if (
+                isNaN(ponderacionSubnota) ||
+                ponderacionSubnota <= 0 ||
+                ponderacionSubnota > 100
+            ) {
+
+                alert(
+                    "Hay una subnota con una ponderación inválida."
+                );
+
+                return;
+
+            }
+
+
+            totalSubnotas +=
+                ponderacionSubnota;
+
+
+            subnotas.push({
+
+                id:
+                    generarId(),
+
+                nombre:
+                    nombreSubnota,
+
+                nota:
+                    notaSubnota,
+
+                pendiente:
+                    pendienteSubnota,
+
+                ponderacion:
+                    ponderacionSubnota
+
+            });
+
+        }
+
+
+        if (
+            totalSubnotas !== 100
+        ) {
+
+            alert(
+                `Las ponderaciones de las subnotas deben sumar 100%. Actualmente suman ${totalSubnotas}%.`
+            );
+
+            return;
+
+        }
+
+    }
+
+
+    const evaluacion = {
+
+        id:
+            generarId(),
+
+        nombre,
+
+        nota,
+
+        pendiente,
+
+        ponderacion,
+
+        tieneSubnotas,
+
+        subnotas
+
+    };
+
+
+    if (ramo.tieneLaboratorio) {
+
+        if (
+            tipoEvaluacionActual ===
+            "teoria"
+        ) {
+
+            ramo.evaluacionesTeoria.push(
+                evaluacion
+            );
+
+        } else {
+
+            ramo.evaluacionesLaboratorio.push(
+                evaluacion
+            );
+
+        }
+
+    } else {
+
+        ramo.evaluaciones.push(
+            evaluacion
+        );
+
+    }
+
+
+    guardarDatos();
+
+
+    cerrarModalEvaluacion();
+
+
+    prepararPantallaEvaluaciones();
+
+}
+
+
+/* =========================================================
+   RENDERIZAR EVALUACIONES
+========================================================= */
+
+function renderizarEvaluaciones(
+    evaluaciones,
+    idContenedor
+) {
+
+    const contenedor =
+        document.getElementById(
+            idContenedor
+        );
+
+
+    if (!contenedor) return;
+
+
+    contenedor.innerHTML = "";
+
+
+    if (!evaluaciones.length) {
+
+        contenedor.innerHTML = `
+
+            <div class="sin-ramos">
 
                 <p>
-                    Organiza tus notas, calcula tu promedio y salva el ramo.
+                    Todavía no hay evaluaciones.
                 </p>
 
-            </header>
+                <span>
+                    Agrega una para comenzar.
+                </span>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
 
 
-            <section class="seccion-ramos">
+    evaluaciones.forEach(
+        evaluacion => {
 
-                <div class="titulo-seccion">
+            const card =
+                document.createElement(
+                    "div"
+                );
 
-                    <h2>Mis ramos</h2>
 
-                    <button
-                        class="boton-agregar"
-                        onclick="nuevoRamo()"
-                    >
-                        + Agregar ramo
-                    </button>
+            card.className =
+                "evaluacion-card";
+
+
+            const nota =
+                calcularNotaEvaluacion(
+                    evaluacion
+                );
+
+
+            const notaTexto =
+                nota === null
+                    ? "Pendiente"
+                    : formatearNumero(
+                        nota
+                    );
+
+
+            card.innerHTML = `
+
+                <h3>
+                    ${escaparHTML(
+                        evaluacion.nombre
+                    )}
+                </h3>
+
+                <div class="evaluacion-info">
+
+                    <span>
+                        Nota:
+                        <strong class="${
+                            nota === null
+                                ? "pendiente"
+                                : ""
+                        }">
+                            ${notaTexto}
+                        </strong>
+                    </span>
+
+                    <span>
+                        Ponderación:
+                        <strong>
+                            ${evaluacion.ponderacion}%
+                        </strong>
+                    </span>
 
                 </div>
 
-
-                <div id="lista-ramos">
-
-                    <div class="sin-ramos">
-
-                        <p>
-                            Todavía no tienes ramos guardados.
-                        </p>
-
-                        <span>
-                            Agrega tu primer ramo para comenzar.
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-        </section>
+            `;
 
 
+            contenedor.appendChild(
+                card
+            );
 
-        <!-- =================================================
-             NUEVO RAMO
-        ================================================== -->
+        }
+    );
 
-        <section
-            id="pantalla-nuevo-ramo"
-            class="pantalla"
-        >
-
-            <div class="barra-superior">
-
-                <button onclick="volverMisRamos()">
-                    ← Mis ramos
-                </button>
-
-            </div>
+}
 
 
-            <div class="contenido-centrado">
+/* =========================================================
+   PONDERACIONES
+========================================================= */
 
-                <h1>Nuevo ramo</h1>
+function actualizarTotalPonderaciones(
+    evaluaciones,
+    idMensaje
+) {
 
-                <div class="tarjeta">
-
-                    <label for="nombre-nuevo-ramo">
-                        ¿Cómo se llama tu ramo?
-                    </label>
-
-                    <input
-                        type="text"
-                        id="nombre-nuevo-ramo"
-                        placeholder="Ej: Cálculo II"
-                    >
-
-                    <button
-                        class="boton-principal"
-                        onclick="guardarNombreRamo()"
-                    >
-                        Continuar →
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
+    const mensaje =
+        document.getElementById(
+            idMensaje
+        );
 
 
-
-        <!-- =================================================
-             LABORATORIO
-        ================================================== -->
-
-        <section
-            id="pantalla-laboratorio"
-            class="pantalla"
-        >
-
-            <div class="barra-superior">
-
-                <button onclick="volverNuevoRamo()">
-                    ← Atrás
-                </button>
-
-            </div>
+    if (!mensaje) return;
 
 
-            <div class="contenido-centrado">
-
-                <h1>Comencemos con lo básico</h1>
-
-                <p class="descripcion">
-                    ¿Tu ramo tiene laboratorio?
-                </p>
-
-
-                <div class="opciones">
-
-                    <button
-                        class="opcion"
-                        onclick="seleccionarLaboratorio(true)"
-                    >
-                        Sí, tiene laboratorio
-                    </button>
-
-                    <button
-                        class="opcion"
-                        onclick="seleccionarLaboratorio(false)"
-                    >
-                        No, no tiene laboratorio
-                    </button>
-
-                </div>
-
-            </div>
-
-        </section>
+    const total =
+        evaluaciones.reduce(
+            (
+                suma,
+                evaluacion
+            ) =>
+                suma +
+                Number(
+                    evaluacion.ponderacion
+                ),
+            0
+        );
 
 
+    if (total === 100) {
 
-        <!-- =================================================
-             DIVISIÓN TEORÍA / LAB
-        ================================================== -->
+        mensaje.className =
+            "mensaje-validacion mensaje-exito";
 
-        <section
-            id="pantalla-division"
-            class="pantalla"
-        >
+        mensaje.textContent =
+            "Ponderación configurada: 100% ✓";
 
-            <div class="barra-superior">
+    } else if (total < 100) {
 
-                <button onclick="volverLaboratorio()">
-                    ← Atrás
-                </button>
+        mensaje.className =
+            "mensaje-validacion mensaje-advertencia";
 
-            </div>
+        mensaje.textContent =
+            `Ponderación configurada: ${total}%. Aún falta asignar ${100 - total}%.`;
+
+    } else {
+
+        mensaje.className =
+            "mensaje-validacion mensaje-peligro";
+
+        mensaje.textContent =
+            `Ponderación configurada: ${total}%. Revisa las ponderaciones ingresadas.`;
+
+    }
+
+}
 
 
-            <div class="contenido-centrado">
+/* =========================================================
+   CÁLCULO DE UNA EVALUACIÓN
+========================================================= */
 
-                <h1>¿Cómo se divide la nota del ramo?</h1>
+function calcularNotaEvaluacion(
+    evaluacion
+) {
 
-                <div class="tarjeta">
+    if (
+        evaluacion.pendiente
+    ) {
 
-                    <div class="campo-porcentaje">
+        return null;
 
-                        <label>
-                            Teoría
-                        </label>
+    }
 
-                        <div class="campo-con-unidad">
 
-                            <input
-                                type="number"
-                                id="porcentaje-teoria"
-                                placeholder="70"
-                                min="0"
-                                max="100"
-                            >
+    if (
+        !evaluacion.tieneSubnotas ||
+        !evaluacion.subnotas ||
+        !evaluacion.subnotas.length
+    ) {
 
-                            <span>%</span>
+        return evaluacion.nota;
+
+    }
+
+
+    const disponibles =
+        evaluacion.subnotas.filter(
+            subnota =>
+                !subnota.pendiente &&
+                subnota.nota !== null
+        );
+
+
+    if (
+        disponibles.length !==
+        evaluacion.subnotas.length
+    ) {
+
+        return null;
+
+    }
+
+
+    let total = 0;
+
+
+    evaluacion.subnotas.forEach(
+        subnota => {
+
+            total +=
+                subnota.nota *
+                (
+                    subnota.ponderacion /
+                    100
+                );
+
+        }
+    );
+
+
+    return redondear(total);
+
+}
+
+
+/* =========================================================
+   PROMEDIO DE UNA LISTA
+========================================================= */
+
+function calcularPromedioLista(
+    evaluaciones
+) {
+
+    if (
+        !evaluaciones.length
+    ) {
+
+        return null;
+
+    }
+
+
+    let total = 0;
+
+    let ponderacionDisponible = 0;
+
+
+    evaluaciones.forEach(
+        evaluacion => {
+
+            const nota =
+                calcularNotaEvaluacion(
+                    evaluacion
+                );
+
+
+            if (nota !== null) {
+
+                total +=
+                    nota *
+                    (
+                        evaluacion.ponderacion /
+                        100
+                    );
+
+
+                ponderacionDisponible +=
+                    Number(
+                        evaluacion.ponderacion
+                    );
+
+            }
+
+        }
+    );
+
+
+    if (
+        ponderacionDisponible === 0
+    ) {
+
+        return null;
+
+    }
+
+
+    return redondear(
+        total *
+        (
+            100 /
+            ponderacionDisponible
+        )
+    );
+
+}
+
+
+/* =========================================================
+   PROMEDIO DEL RAMO
+========================================================= */
+
+function calcularPromedioRamo(
+    ramo
+) {
+
+    if (
+        ramo.tieneLaboratorio
+    ) {
+
+        const teoria =
+            calcularPromedioLista(
+                ramo.evaluacionesTeoria
+            );
+
+
+        const laboratorio =
+            calcularPromedioLista(
+                ramo.evaluacionesLaboratorio
+            );
+
+
+        let total = 0;
+
+        let peso = 0;
+
+
+        if (teoria !== null) {
+
+            total +=
+                teoria *
+                (
+                    ramo.porcentajeTeoria /
+                    100
+                );
+
+            peso +=
+                ramo.porcentajeTeoria;
+
+        }
+
+
+        if (laboratorio !== null) {
+
+            total +=
+                laboratorio *
+                (
+                    ramo.porcentajeLaboratorio /
+                    100
+                );
+
+            peso +=
+                ramo.porcentajeLaboratorio;
+
+        }
+
+
+        if (!peso) {
+
+            return null;
+
+        }
+
+
+        return redondear(
+            total *
+            (
+                100 /
+                peso
+            )
+        );
+
+    }
+
+
+    return calcularPromedioLista(
+        ramo.evaluaciones
+    );
+
+}
+
+
+/* =========================================================
+   RESUMEN DEL RAMO
+========================================================= */
+
+function abrirRamo(id) {
+
+    ramoActualId =
+        id;
+
+    modoEdicion =
+        false;
+
+
+    renderizarResumenRamo();
+
+
+    mostrarPantalla(
+        "pantalla-ramo"
+    );
+
+}
+
+
+function renderizarResumenRamo() {
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (!ramo) return;
+
+
+    document.getElementById(
+        "titulo-ramo"
+    ).textContent =
+        ramo.nombre;
+
+
+    const promedio =
+        calcularPromedioRamo(
+            ramo
+        );
+
+
+    document.getElementById(
+        "promedio-actual"
+    ).textContent =
+        promedio === null
+            ? "—"
+            : formatearNumero(
+                promedio
+            );
+
+
+    document.getElementById(
+        "estado-ramo"
+    ).textContent =
+        obtenerEstadoRamo(
+            ramo
+        );
+
+
+    renderizarResumenEvaluaciones(
+        ramo
+    );
+
+
+    calcularQueNecesitas(
+        ramo
+    );
+
+
+    cargarObjetivo(
+        ramo
+    );
+
+
+    cargarConfiguracionExamen();
+
+
+    prepararPAR(
+        ramo
+    );
+
+}
+
+
+/* =========================================================
+   RESUMEN DE EVALUACIONES
+========================================================= */
+
+function renderizarResumenEvaluaciones(
+    ramo
+) {
+
+    const contenedor =
+        document.getElementById(
+            "resumen-evaluaciones"
+        );
+
+
+    if (!contenedor) return;
+
+
+    contenedor.innerHTML = "";
+
+
+    const grupos = [];
+
+
+    if (ramo.tieneLaboratorio) {
+
+        grupos.push({
+
+            titulo:
+                "Teoría",
+
+            evaluaciones:
+                ramo.evaluacionesTeoria
+
+        });
+
+
+        grupos.push({
+
+            titulo:
+                "Laboratorio",
+
+            evaluaciones:
+                ramo.evaluacionesLaboratorio
+
+        });
+
+    } else {
+
+        grupos.push({
+
+            titulo:
+                null,
+
+            evaluaciones:
+                ramo.evaluaciones
+
+        });
+
+    }
+
+
+    grupos.forEach(
+        grupo => {
+
+            if (grupo.titulo) {
+
+                const titulo =
+                    document.createElement(
+                        "h3"
+                    );
+
+
+                titulo.textContent =
+                    grupo.titulo;
+
+
+                contenedor.appendChild(
+                    titulo
+                );
+
+            }
+
+
+            grupo.evaluaciones.forEach(
+                evaluacion => {
+
+                    const card =
+                        document.createElement(
+                            "div"
+                        );
+
+
+                    card.className =
+                        "evaluacion-card";
+
+
+                    const nota =
+                        calcularNotaEvaluacion(
+                            evaluacion
+                        );
+
+
+                    const notaTexto =
+                        nota === null
+                            ? "Pendiente"
+                            : formatearNumero(
+                                nota
+                            );
+
+
+                    card.innerHTML = `
+
+                        <h3>
+                            ${escaparHTML(
+                                evaluacion.nombre
+                            )}
+                        </h3>
+
+                        <div class="evaluacion-info">
+
+                            <span>
+                                Nota:
+                                <strong class="${
+                                    nota === null
+                                        ? "pendiente"
+                                        : ""
+                                }">
+                                    ${notaTexto}
+                                </strong>
+                            </span>
+
+                            <span>
+                                Ponderación:
+                                <strong>
+                                    ${evaluacion.ponderacion}%
+                                </strong>
+                            </span>
 
                         </div>
 
-                    </div>
+                    `;
 
 
-                    <div class="campo-porcentaje">
+                    contenedor.appendChild(
+                        card
+                    );
 
-                        <label>
-                            Laboratorio
-                        </label>
+                }
+            );
 
-                        <div class="campo-con-unidad">
+        }
+    );
 
-                            <input
-                                type="number"
-                                id="porcentaje-laboratorio"
-                                placeholder="30"
-                                min="0"
-                                max="100"
-                            >
-
-                            <span>%</span>
-
-                        </div>
-
-                    </div>
+}
 
 
-                    <div
-                        id="mensaje-division"
-                        class="mensaje-validacion"
-                    ></div>
+/* =========================================================
+   EVALUACIONES PENDIENTES
+========================================================= */
+
+function obtenerEvaluacionesRamo(
+    ramo
+) {
+
+    if (
+        !ramo.tieneLaboratorio
+    ) {
+
+        return ramo.evaluaciones;
+
+    }
 
 
-                    <button
-                        class="boton-principal"
-                        onclick="guardarDivision()"
-                    >
-                        Continuar →
-                    </button>
+    return [
+        ...ramo.evaluacionesTeoria,
+        ...ramo.evaluacionesLaboratorio
+    ];
+
+}
+
+
+function obtenerEvaluacionesPendientes(
+    ramo
+) {
+
+    return obtenerEvaluacionesRamo(
+        ramo
+    ).filter(
+        evaluacion =>
+            calcularNotaEvaluacion(
+                evaluacion
+            ) === null
+    );
+
+}
+
+
+/* =========================================================
+   QUÉ NECESITAS PARA APROBAR
+========================================================= */
+
+function calcularQueNecesitas(
+    ramo
+) {
+
+    const contenedor =
+        document.getElementById(
+            "resultado-aprobar"
+        );
+
+
+    if (!contenedor) return;
+
+
+    const objetivo =
+        Number(
+            ramo.notaMinima
+        );
+
+
+    const promedio =
+        calcularPromedioRamo(
+            ramo
+        );
+
+
+    const pendientes =
+        obtenerEvaluacionesPendientes(
+            ramo
+        );
+
+
+    if (!pendientes.length) {
+
+        if (
+            promedio !== null &&
+            promedio >= objetivo
+        ) {
+
+            contenedor.innerHTML = `
+
+                <div class="mensaje-exito">
+
+                    ¡Lo lograste!
+
+                    <br>
+
+                    Tu promedio final es
+                    <strong>
+                        ${formatearNumero(
+                            promedio
+                        )}
+                    </strong>.
 
                 </div>
+
+            `;
+
+        } else {
+
+            contenedor.innerHTML = `
+
+                <div class="mensaje-peligro">
+
+                    Esta vez no alcanzaste el objetivo.
+
+                    <br>
+
+                    Tu promedio final es
+                    <strong>
+                        ${
+                            promedio === null
+                                ? "—"
+                                : formatearNumero(
+                                    promedio
+                                )
+                        }
+                    </strong>.
+
+                </div>
+
+            `;
+
+        }
+
+        return;
+
+    }
+
+
+    const resultado =
+        calcularNotaNecesaria(
+            ramo,
+            objetivo
+        );
+
+
+    if (
+        resultado === null
+    ) {
+
+        contenedor.innerHTML = `
+
+            <div class="mensaje-advertencia">
+
+                Aún tienes evaluaciones pendientes.
 
             </div>
 
-        </section>
+        `;
+
+        return;
+
+    }
 
 
+    if (
+        resultado <= 1
+    ) {
 
-        <!-- =================================================
-             CONFIGURACIÓN EVALUACIONES
-        ================================================== -->
+        contenedor.innerHTML = `
 
-        <section
-            id="pantalla-evaluaciones"
-            class="pantalla"
-        >
+            <div class="mensaje-exito">
 
-            <div class="barra-superior">
-
-                <button onclick="volverAnteriorConfiguracion()">
-                    ← Atrás
-                </button>
-
-            </div>
-
-
-            <div class="contenido">
-
-                <h1>¿Cómo se evalúa tu ramo?</h1>
-
-                <p class="descripcion">
-                    Agrega las evaluaciones que forman parte de tu ramo
-                    y señala cuánto vale cada una.
-                </p>
-
-
-                <div
-                    id="bloque-evaluaciones"
-                    class="bloque-evaluaciones"
-                >
-
-                    <h2>Evaluaciones</h2>
-
-                    <div id="lista-evaluaciones"></div>
-
-                    <button
-                        class="boton-secundario"
-                        onclick="agregarEvaluacion()"
-                    >
-                        + Agregar evaluación
-                    </button>
-
-                    <div
-                        id="total-ponderaciones"
-                        class="mensaje-validacion"
-                    ></div>
-
-                </div>
-
-
-                <div
-                    id="bloque-teoria"
-                    class="bloque-evaluaciones oculto"
-                >
-
-                    <h2>Evaluaciones de teoría</h2>
-
-                    <div id="lista-teoria"></div>
-
-                    <button
-                        class="boton-secundario"
-                        onclick="agregarEvaluacion('teoria')"
-                    >
-                        + Agregar evaluación
-                    </button>
-
-                    <div
-                        id="total-teoria"
-                        class="mensaje-validacion"
-                    ></div>
-
-                </div>
-
-
-                <div
-                    id="bloque-laboratorio"
-                    class="bloque-evaluaciones oculto"
-                >
-
-                    <h2>Evaluaciones de laboratorio</h2>
-
-                    <div id="lista-laboratorio"></div>
-
-                    <button
-                        class="boton-secundario"
-                        onclick="agregarEvaluacion('laboratorio')"
-                    >
-                        + Agregar evaluación
-                    </button>
-
-                    <div
-                        id="total-laboratorio"
-                        class="mensaje-validacion"
-                    ></div>
-
-                </div>
-
-
-                <div class="tarjeta">
-
-                    <h2>¿Cuál es la nota mínima para aprobar?</h2>
-
-                    <input
-                        type="number"
-                        id="nota-minima"
-                        placeholder="4,0"
-                        min="1"
-                        max="7"
-                        step="0.1"
-                    >
-
-                </div>
-
-
-                <button
-                    class="boton-principal"
-                    onclick="guardarConfiguracion()"
-                >
-                    Guardar ramo
-                </button>
+                Con tus notas actuales,
+                ya tienes el promedio necesario
+                para aprobar.
 
             </div>
 
-        </section>
+        `;
+
+        return;
+
+    }
 
 
+    if (
+        resultado > 7
+    ) {
 
-        <!-- =================================================
-             RESUMEN DEL RAMO
-        ================================================== -->
+        contenedor.innerHTML = `
 
-        <section
-            id="pantalla-ramo"
-            class="pantalla"
-        >
+            <div class="mensaje-advertencia">
 
-            <div class="barra-superior">
-
-                <button onclick="volverMisRamos()">
-                    ← Mis ramos
-                </button>
-
-                <button onclick="editarRamo()">
-                    Editar ramo
-                </button>
+                Con las evaluaciones pendientes,
+                no es posible alcanzar
+                el promedio mínimo de
+                ${formatearNumero(
+                    objetivo
+                )}
+                solamente con ellas.
 
             </div>
 
+        `;
 
-            <div class="contenido">
+        return;
 
-                <h1 id="titulo-ramo"></h1>
+    }
 
 
-                <div class="tarjeta resultado-principal">
+    contenedor.innerHTML = `
 
-                    <h2>Tu promedio actual</h2>
+        <p>
 
-                    <div
-                        id="promedio-actual"
-                        class="promedio-grande"
-                    >
-                        —
-                    </div>
+            Necesitas obtener aproximadamente
+            <strong>
+                ${formatearNumero(
+                    resultado
+                )}
+            </strong>
 
-                    <p id="estado-ramo"></p>
+            en las evaluaciones pendientes
+            para alcanzar
 
-                </div>
+            <strong>
+                ${formatearNumero(
+                    objetivo
+                )}
+            </strong>.
 
+        </p>
 
-                <div class="tarjeta">
+    `;
 
-                    <h2>Evaluaciones</h2>
+}
 
-                    <div id="resumen-evaluaciones"></div>
 
-                </div>
+function calcularNotaNecesaria(
+    ramo,
+    objetivo
+) {
 
+    /*
+        Para ramos sin laboratorio,
+        el cálculo utiliza directamente
+        las ponderaciones.
 
-                <div class="tarjeta">
+        Para ramos con laboratorio,
+        se calcula respetando la división
+        teoría/laboratorio.
+    */
 
-                    <h2>¿Qué necesitas para aprobar?</h2>
+    if (
+        !ramo.tieneLaboratorio
+    ) {
 
-                    <div id="resultado-aprobar"></div>
+        return calcularNotaNecesariaLista(
+            ramo.evaluaciones,
+            objetivo
+        );
 
-                </div>
+    }
 
 
-                <div class="tarjeta">
+    const teoria =
+        calcularNotaNecesariaLista(
+            ramo.evaluacionesTeoria,
+            objetivo
+        );
 
-                    <h2>Elige tu objetivo</h2>
 
-                    <div class="opciones-radio">
+    const laboratorio =
+        calcularNotaNecesariaLista(
+            ramo.evaluacionesLaboratorio,
+            objetivo
+        );
 
-                        <label>
 
-                            <input
-                                type="radio"
-                                name="objetivo"
-                                value="minimo"
-                                checked
-                                onchange="cambiarObjetivo()"
-                            >
+    const promedioTeoria =
+        calcularPromedioLista(
+            ramo.evaluacionesTeoria
+        );
 
-                            Promedio mínimo para aprobar
 
-                        </label>
+    const promedioLaboratorio =
+        calcularPromedioLista(
+            ramo.evaluacionesLaboratorio
+        );
 
 
-                        <label>
+    const pendientesTeoria =
+        obtenerPendientesLista(
+            ramo.evaluacionesTeoria
+        );
 
-                            <input
-                                type="radio"
-                                name="objetivo"
-                                value="otro"
-                                onchange="cambiarObjetivo()"
-                            >
 
-                            Otro promedio
+    const pendientesLaboratorio =
+        obtenerPendientesLista(
+            ramo.evaluacionesLaboratorio
+        );
 
-                        </label>
 
-                    </div>
+    /*
+        Si no hay pendientes en ninguno
+        de los dos bloques, no hay cálculo
+        que realizar.
+    */
+
+    if (
+        !pendientesTeoria.length &&
+        !pendientesLaboratorio.length
+    ) {
+
+        return null;
+
+    }
+
+
+    /*
+        Si hay pendientes solamente en teoría.
+    */
+
+    if (
+        pendientesTeoria.length &&
+        !pendientesLaboratorio.length
+    ) {
+
+        const objetivoTeoria =
+            (
+                objetivo -
+                (
+                    promedioLaboratorio *
+                    ramo.porcentajeLaboratorio /
+                    100
+                )
+            ) /
+            (
+                ramo.porcentajeTeoria /
+                100
+            );
 
 
-                    <div
-                        id="campo-otro-objetivo"
-                        class="oculto"
-                    >
+        return calcularNotaNecesariaLista(
+            ramo.evaluacionesTeoria,
+            objetivoTeoria
+        );
 
-                        <label for="otro-objetivo">
-                            ¿Qué promedio quieres alcanzar?
-                        </label>
+    }
 
-                        <input
-                            type="number"
-                            id="otro-objetivo"
-                            placeholder="Ej: 5,0"
-                            min="1"
-                            max="7"
-                            step="0.1"
-                            onchange="calcularObjetivo()"
-                        >
 
-                    </div>
+    /*
+        Si hay pendientes solamente
+        en laboratorio.
+    */
 
+    if (
+        !pendientesTeoria.length &&
+        pendientesLaboratorio.length
+    ) {
 
-                    <div id="resultado-objetivo"></div>
+        const objetivoLaboratorio =
+            (
+                objetivo -
+                (
+                    promedioTeoria *
+                    ramo.porcentajeTeoria /
+                    100
+                )
+            ) /
+            (
+                ramo.porcentajeLaboratorio /
+                100
+            );
 
-                </div>
 
+        return calcularNotaNecesariaLista(
+            ramo.evaluacionesLaboratorio,
+            objetivoLaboratorio
+        );
 
-                <div
-                    id="bloque-par"
-                    class="tarjeta"
-                >
+    }
 
-                    <h2>¿Tienes opción de PAR?</h2>
 
-                    <div class="opciones-radio">
+    /*
+        Si existen pendientes tanto
+        en teoría como en laboratorio,
+        mostramos un cálculo aproximado
+        considerando que se obtiene la
+        misma nota en todas las pendientes.
+    */
 
-                        <label>
+    let aporteActual = 0;
 
-                            <input
-                                type="radio"
-                                name="tiene-par"
-                                value="si"
-                                onchange="mostrarPAR(true)"
-                            >
+    let pesoPendiente = 0;
 
-                            Sí
 
-                        </label>
+    const procesarLista =
+        (
+            lista,
+            pesoBloque
+        ) => {
 
+            lista.forEach(
+                evaluacion => {
 
-                        <label>
+                    const nota =
+                        calcularNotaEvaluacion(
+                            evaluacion
+                        );
 
-                            <input
-                                type="radio"
-                                name="tiene-par"
-                                value="no"
-                                onchange="mostrarPAR(false)"
-                            >
 
-                            No
+                    const peso =
+                        Number(
+                            evaluacion.ponderacion
+                        ) /
+                        100 *
+                        (
+                            pesoBloque /
+                            100
+                        );
 
-                        </label>
 
-                    </div>
+                    if (
+                        nota === null
+                    ) {
 
+                        pesoPendiente +=
+                            peso;
 
-                    <div
-                        id="contenido-par"
-                        class="oculto"
-                    >
+                    } else {
 
-                        <p>
-                            Elige la nota que quieres reemplazar
-                            y calcula qué necesitas obtener en la PAR.
-                        </p>
+                        aporteActual +=
+                            nota *
+                            peso;
 
-                        <div id="notas-reemplazables"></div>
+                    }
 
-                        <div id="resultado-par"></div>
+                }
+            );
 
-                    </div>
+        };
 
-                </div>
 
+    procesarLista(
+        ramo.evaluacionesTeoria,
+        ramo.porcentajeTeoria
+    );
 
-                <div
-                    id="bloque-examen"
-                    class="tarjeta"
-                >
 
-                    <h2>¿Y si tienes que dar examen?</h2>
+    procesarLista(
+        ramo.evaluacionesLaboratorio,
+        ramo.porcentajeLaboratorio
+    );
 
-                    <div class="examen-configuracion">
 
-                        <div>
+    if (
+        pesoPendiente <= 0
+    ) {
 
-                            <label>
-                                Nota de presentación
-                            </label>
+        return null;
 
-                            <input
-                                type="number"
-                                id="porcentaje-presentacion"
-                                placeholder="70"
-                                min="0"
-                                max="100"
-                            >
+    }
 
-                            <span>%</span>
 
-                        </div>
+    return redondear(
+        (
+            objetivo -
+            aporteActual
+        ) /
+        pesoPendiente
+    );
 
+}
 
-                        <div>
 
-                            <label>
-                                Examen
-                            </label>
+function calcularNotaNecesariaLista(
+    evaluaciones,
+    objetivo
+) {
 
-                            <input
-                                type="number"
-                                id="porcentaje-examen"
-                                placeholder="30"
-                                min="0"
-                                max="100"
-                            >
+    if (
+        !evaluaciones.length
+    ) {
 
-                            <span>%</span>
+        return null;
 
-                        </div>
+    }
 
-                    </div>
 
+    let aporteActual = 0;
 
-                    <div
-                        id="resultado-examen"
-                        class="resultado-examen"
-                    ></div>
+    let pesoPendiente = 0;
 
-                </div>
 
+    evaluaciones.forEach(
+        evaluacion => {
 
-                <div class="zona-peligro">
+            const nota =
+                calcularNotaEvaluacion(
+                    evaluacion
+                );
 
-                    <button
-                        class="boton-eliminar"
-                        onclick="confirmarEliminarRamo()"
-                    >
-                        Eliminar ramo
-                    </button>
 
-                </div>
+            const peso =
+                Number(
+                    evaluacion.ponderacion
+                ) /
+                100;
+
+
+            if (
+                nota === null
+            ) {
+
+                pesoPendiente +=
+                    peso;
+
+            } else {
+
+                aporteActual +=
+                    nota *
+                    peso;
+
+            }
+
+        }
+    );
+
+
+    if (
+        pesoPendiente <= 0
+    ) {
+
+        return null;
+
+    }
+
+
+    return redondear(
+        (
+            objetivo -
+            aporteActual
+        ) /
+        pesoPendiente
+    );
+
+}
+
+
+function obtenerPendientesLista(
+    evaluaciones
+) {
+
+    return evaluaciones.filter(
+        evaluacion =>
+            calcularNotaEvaluacion(
+                evaluacion
+            ) === null
+    );
+
+}
+
+
+/* =========================================================
+   OBJETIVO PERSONALIZADO
+========================================================= */
+
+function cambiarObjetivo() {
+
+    const opcion =
+        document.querySelector(
+            'input[name="objetivo"]:checked'
+        );
+
+
+    const campo =
+        document.getElementById(
+            "campo-otro-objetivo"
+        );
+
+
+    if (
+        opcion &&
+        opcion.value === "otro"
+    ) {
+
+        campo.classList.remove(
+            "oculto"
+        );
+
+
+        calcularObjetivo();
+
+    } else {
+
+        campo.classList.add(
+            "oculto"
+        );
+
+
+        document.getElementById(
+            "resultado-objetivo"
+        ).innerHTML = "";
+
+    }
+
+}
+
+
+function calcularObjetivo() {
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    const objetivo =
+        Number(
+            document.getElementById(
+                "otro-objetivo"
+            ).value
+        );
+
+
+    const contenedor =
+        document.getElementById(
+            "resultado-objetivo"
+        );
+
+
+    if (
+        !ramo ||
+        isNaN(objetivo) ||
+        objetivo < 1 ||
+        objetivo > 7
+    ) {
+
+        contenedor.innerHTML = "";
+
+        return;
+
+    }
+
+
+    const resultado =
+        calcularNotaNecesaria(
+            ramo,
+            objetivo
+        );
+
+
+    if (
+        resultado === null
+    ) {
+
+        contenedor.innerHTML =
+            "No hay evaluaciones pendientes.";
+
+        return;
+
+    }
+
+
+    if (
+        resultado <= 1
+    ) {
+
+        contenedor.innerHTML = `
+
+            <div class="mensaje-exito">
+
+                Ya tienes lo necesario
+                para alcanzar ese promedio.
 
             </div>
 
-        </section>
+        `;
+
+        return;
+
+    }
 
 
+    if (
+        resultado > 7
+    ) {
 
-        <!-- =================================================
-             MODAL NUEVA EVALUACIÓN
-        ================================================== -->
+        contenedor.innerHTML = `
 
-        <div
-            id="modal-evaluacion"
-            class="modal oculto"
-        >
+            <div class="mensaje-advertencia">
 
-            <div class="modal-contenido">
-
-                <h2>Nueva evaluación</h2>
-
-
-                <label>
-                    Nombre de la evaluación
-                </label>
-
-                <input
-                    type="text"
-                    id="nombre-evaluacion"
-                    placeholder="Ej: Prueba 1"
-                >
-
-
-                <label>
-                    Nota
-                </label>
-
-                <input
-                    type="number"
-                    id="nota-evaluacion"
-                    placeholder="Ej: 5,5"
-                    min="1"
-                    max="7"
-                    step="0.1"
-                >
-
-
-                <label class="checkbox">
-
-                    <input
-                        type="checkbox"
-                        id="nota-pendiente"
-                        onchange="cambiarEstadoNota()"
-                    >
-
-                    Aún no tengo esta nota
-
-                </label>
-
-
-                <label>
-                    Ponderación (%)
-                </label>
-
-                <input
-                    type="number"
-                    id="ponderacion-evaluacion"
-                    placeholder="Ej: 25"
-                    min="0"
-                    max="100"
-                >
-
-
-                <p>
-                    ¿Esta evaluación está compuesta por otras notas?
-                </p>
-
-                <div class="opciones-radio">
-
-                    <label>
-
-                        <input
-                            type="radio"
-                            name="tiene-subnotas"
-                            value="no"
-                            checked
-                            onchange="mostrarSubnotas(false)"
-                        >
-
-                        No
-
-                    </label>
-
-
-                    <label>
-
-                        <input
-                            type="radio"
-                            name="tiene-subnotas"
-                            value="si"
-                            onchange="mostrarSubnotas(true)"
-                        >
-
-                        Sí
-
-                    </label>
-
-                </div>
-
-
-                <div
-                    id="seccion-subnotas"
-                    class="oculto"
-                >
-
-                    <h3>¿Cómo se compone esta evaluación?</h3>
-
-                    <div id="lista-subnotas"></div>
-
-                    <button
-                        class="boton-secundario"
-                        onclick="agregarSubnota()"
-                    >
-                        + Agregar nota
-                    </button>
-
-                    <div
-                        id="total-subnotas"
-                        class="mensaje-validacion"
-                    ></div>
-
-                </div>
-
-
-                <div class="modal-botones">
-
-                    <button
-                        class="boton-secundario"
-                        onclick="cerrarModalEvaluacion()"
-                    >
-                        Cancelar
-                    </button>
-
-                    <button
-                        class="boton-principal"
-                        onclick="guardarEvaluacion()"
-                    >
-                        Guardar evaluación
-                    </button>
-
-                </div>
+                Con las evaluaciones pendientes
+                no es posible alcanzar
+                ese promedio.
 
             </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    contenedor.innerHTML = `
+
+        Necesitas aproximadamente
+        <strong>
+            ${formatearNumero(
+                resultado
+            )}
+        </strong>
+
+        en las evaluaciones pendientes.
+
+    `;
+
+}
+
+
+function cargarObjetivo() {
+
+    const minimo =
+        document.querySelector(
+            'input[name="objetivo"][value="minimo"]'
+        );
+
+
+    if (minimo) {
+
+        minimo.checked = true;
+
+    }
+
+
+    document.getElementById(
+        "campo-otro-objetivo"
+    ).classList.add(
+        "oculto"
+    );
+
+
+    document.getElementById(
+        "resultado-objetivo"
+    ).innerHTML = "";
+
+
+    document.getElementById(
+        "otro-objetivo"
+    ).value = "";
+
+}
+
+
+/* =========================================================
+   PAR
+========================================================= */
+
+function mostrarPAR(
+    mostrar
+) {
+
+    const contenido =
+        document.getElementById(
+            "contenido-par"
+        );
+
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (!ramo) return;
+
+
+    ramo.tienePAR =
+        mostrar;
+
+
+    guardarDatos();
+
+
+    if (mostrar) {
+
+        contenido.classList.remove(
+            "oculto"
+        );
+
+
+        prepararPAR(
+            ramo
+        );
+
+    } else {
+
+        contenido.classList.add(
+            "oculto"
+        );
+
+
+        document.getElementById(
+            "resultado-par"
+        ).innerHTML = "";
+
+    }
+
+}
+
+
+function prepararPAR(
+    ramo
+) {
+
+    const radios =
+        document.querySelectorAll(
+            'input[name="tiene-par"]'
+        );
+
+
+    radios.forEach(
+        radio => {
+
+            radio.checked =
+                radio.value ===
+                (
+                    ramo.tienePAR
+                        ? "si"
+                        : "no"
+                );
+
+        }
+    );
+
+
+    const contenido =
+        document.getElementById(
+            "contenido-par"
+        );
+
+
+    if (
+        !ramo.tienePAR
+    ) {
+
+        contenido.classList.add(
+            "oculto"
+        );
+
+        return;
+
+    }
+
+
+    contenido.classList.remove(
+        "oculto"
+    );
+
+
+    const evaluaciones =
+        obtenerEvaluacionesRamo(
+            ramo
+        ).filter(
+            evaluacion =>
+                calcularNotaEvaluacion(
+                    evaluacion
+                ) !== null
+        );
+
+
+    const contenedor =
+        document.getElementById(
+            "notas-reemplazables"
+        );
+
+
+    contenedor.innerHTML = "";
+
+
+    document.getElementById(
+        "resultado-par"
+    ).innerHTML = "";
+
+
+    if (
+        !evaluaciones.length
+    ) {
+
+        contenedor.innerHTML =
+            "<p>Aún no tienes notas disponibles para reemplazar.</p>";
+
+        return;
+
+    }
+
+
+    evaluaciones.forEach(
+        evaluacion => {
+
+            const nota =
+                calcularNotaEvaluacion(
+                    evaluacion
+                );
+
+
+            const boton =
+                document.createElement(
+                    "button"
+                );
+
+
+            boton.className =
+                "opcion";
+
+
+            boton.textContent =
+                `${evaluacion.nombre} — ${formatearNumero(nota)}`;
+
+
+            boton.addEventListener(
+                "click",
+                () =>
+                    calcularPAR(
+                        evaluacion.id
+                    )
+            );
+
+
+            contenedor.appendChild(
+                boton
+            );
+
+        }
+    );
+
+}
+
+
+function calcularPAR(
+    evaluacionId
+) {
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (!ramo) return;
+
+
+    const evaluaciones =
+        obtenerEvaluacionesRamo(
+            ramo
+        );
+
+
+    const seleccionada =
+        evaluaciones.find(
+            evaluacion =>
+                evaluacion.id ===
+                evaluacionId
+        );
+
+
+    if (!seleccionada) return;
+
+
+    const notaActual =
+        calcularNotaEvaluacion(
+            seleccionada
+        );
+
+
+    const objetivo =
+        Number(
+            ramo.notaMinima
+        );
+
+
+    /*
+        Este cálculo corresponde a ramos
+        sin laboratorio.
+    */
+
+    if (
+        !ramo.tieneLaboratorio
+    ) {
+
+        let aporteSinNota = 0;
+
+
+        evaluaciones.forEach(
+            evaluacion => {
+
+                if (
+                    evaluacion.id ===
+                    evaluacionId
+                ) return;
+
+
+                const nota =
+                    calcularNotaEvaluacion(
+                        evaluacion
+                    );
+
+
+                if (nota !== null) {
+
+                    aporteSinNota +=
+                        nota *
+                        (
+                            evaluacion.ponderacion /
+                            100
+                        );
+
+                }
+
+            }
+        );
+
+
+        const pesoNota =
+            seleccionada.ponderacion /
+            100;
+
+
+        const notaNecesaria =
+            (
+                objetivo -
+                aporteSinNota
+            ) /
+            pesoNota;
+
+
+        mostrarResultadoPAR(
+            seleccionada,
+            notaActual,
+            notaNecesaria,
+            objetivo
+        );
+
+
+        return;
+
+    }
+
+
+    /*
+        Para laboratorio calculamos
+        respetando teoría/laboratorio.
+    */
+
+    let aporteSinNota = 0;
+
+    let pesoSeleccionada = 0;
+
+
+    const procesar =
+        (
+            lista,
+            pesoBloque
+        ) => {
+
+            lista.forEach(
+                evaluacion => {
+
+                    const peso =
+                        (
+                            evaluacion.ponderacion /
+                            100
+                        ) *
+                        (
+                            pesoBloque /
+                            100
+                        );
+
+
+                    if (
+                        evaluacion.id ===
+                        evaluacionId
+                    ) {
+
+                        pesoSeleccionada =
+                            peso;
+
+                        return;
+
+                    }
+
+
+                    const nota =
+                        calcularNotaEvaluacion(
+                            evaluacion
+                        );
+
+
+                    if (nota !== null) {
+
+                        aporteSinNota +=
+                            nota *
+                            peso;
+
+                    }
+
+                }
+            );
+
+        };
+
+
+    procesar(
+        ramo.evaluacionesTeoria,
+        ramo.porcentajeTeoria
+    );
+
+
+    procesar(
+        ramo.evaluacionesLaboratorio,
+        ramo.porcentajeLaboratorio
+    );
+
+
+    const notaNecesaria =
+        (
+            objetivo -
+            aporteSinNota
+        ) /
+        pesoSeleccionada;
+
+
+    mostrarResultadoPAR(
+        seleccionada,
+        notaActual,
+        notaNecesaria,
+        objetivo
+    );
+
+}
+
+
+function mostrarResultadoPAR(
+    seleccionada,
+    notaActual,
+    notaNecesaria,
+    objetivo
+) {
+
+    const contenedor =
+        document.getElementById(
+            "resultado-par"
+        );
+
+
+    if (
+        notaNecesaria <= 1
+    ) {
+
+        contenedor.innerHTML = `
+
+            <div class="mensaje-exito">
+
+                Con la PAR puedes alcanzar
+                el promedio mínimo incluso
+                con una nota mínima.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    if (
+        notaNecesaria > 7
+    ) {
+
+        contenedor.innerHTML = `
+
+            <div class="mensaje-advertencia">
+
+                La PAR por sí sola no sería
+                suficiente para alcanzar
+                ${formatearNumero(
+                    objetivo
+                )}.
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    contenedor.innerHTML = `
+
+        <div class="mensaje-exito">
+
+            Para alcanzar
+            <strong>
+                ${formatearNumero(
+                    objetivo
+                )}
+            </strong>
+
+            reemplazando
+            <strong>
+                ${escaparHTML(
+                    seleccionada.nombre
+                )}
+            </strong>
+
+            (${formatearNumero(
+                notaActual
+            )}),
+
+            necesitarías aproximadamente:
+
+            <br><br>
+
+            <strong>
+                ${formatearNumero(
+                    notaNecesaria
+                )}
+            </strong>
+
+            en la PAR.
 
         </div>
 
+    `;
+
+}
 
 
-        <!-- =================================================
-             MODAL CONFIRMACIÓN SALIDA
-        ================================================== -->
+/* =========================================================
+   EXAMEN
+========================================================= */
 
-        <div
-            id="modal-salir"
-            class="modal oculto"
-        >
+function cargarConfiguracionExamen() {
 
-            <div class="modal-contenido">
-
-                <h2>¿Quieres salir sin guardar los cambios?</h2>
-
-                <p>
-                    Los cambios realizados no se conservarán.
-                </p>
-
-                <div class="modal-botones">
-
-                    <button
-                        class="boton-secundario"
-                        onclick="cerrarModalSalir()"
-                    >
-                        Seguir editando
-                    </button>
-
-                    <button
-                        class="boton-eliminar"
-                        onclick="salirSinGuardar()"
-                    >
-                        Salir sin guardar
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
+    const ramo =
+        obtenerRamoActual();
 
 
-
-        <!-- =================================================
-             TARJETA FLOTANTE:
-             CÓMO FUNCIONA
-        ================================================== -->
-
-        <div
-            id="panel-como-funciona"
-            class="panel-menu oculto"
-            onclick="cerrarPanelDesdeFondo(event)"
-        >
-
-            <div class="panel-contenido">
-
-                <div class="panel-encabezado">
-
-                    <div>
-
-                        <h2>Cómo funciona</h2>
-
-                        <p>
-                            Aprende a utilizar la calculadora.
-                        </p>
-
-                    </div>
+    if (!ramo) return;
 
 
-                    <button
-                        class="panel-cerrar"
-                        onclick="cerrarPanelMenu()"
-                        aria-label="Cerrar"
-                    >
-                        ×
-                    </button>
-
-                </div>
+    document.getElementById(
+        "porcentaje-presentacion"
+    ).value =
+        ramo.porcentajePresentacion;
 
 
-                <div class="panel-tarjeta">
-
-                    <h3>1. Agrega tu ramo</h3>
-
-                    <p>
-                        Crea un nuevo ramo e indica si tiene laboratorio.
-                    </p>
-
-                </div>
+    document.getElementById(
+        "porcentaje-examen"
+    ).value =
+        ramo.porcentajeExamen;
 
 
-                <div class="panel-tarjeta">
+    calcularExamen();
 
-                    <h3>2. Configura tus evaluaciones</h3>
-
-                    <p>
-                        Agrega tus evaluaciones, sus notas y ponderaciones.
-                    </p>
-
-                </div>
+}
 
 
-                <div class="panel-tarjeta">
+function calcularExamen() {
 
-                    <h3>3. Revisa tu promedio</h3>
-
-                    <p>
-                        La calculadora actualizará tu promedio según las
-                        notas ingresadas.
-                    </p>
-
-                </div>
+    const ramo =
+        obtenerRamoActual();
 
 
-                <div class="panel-tarjeta">
+    if (!ramo) return;
 
-                    <h3>4. Calcula lo que necesitas</h3>
 
-                    <p>
-                        Puedes revisar qué nota necesitas para alcanzar
-                        tu objetivo.
-                    </p>
+    const presentacion =
+        calcularPromedioRamo(
+            ramo
+        );
 
-                </div>
+
+    const porcentajePresentacion =
+        Number(
+            document.getElementById(
+                "porcentaje-presentacion"
+            ).value
+        );
+
+
+    const porcentajeExamen =
+        Number(
+            document.getElementById(
+                "porcentaje-examen"
+            ).value
+        );
+
+
+    const contenedor =
+        document.getElementById(
+            "resultado-examen"
+        );
+
+
+    if (
+        isNaN(porcentajePresentacion) ||
+        isNaN(porcentajeExamen) ||
+        porcentajePresentacion +
+        porcentajeExamen !==
+        100
+    ) {
+
+        contenedor.innerHTML = `
+
+            <div class="mensaje-advertencia">
+
+                Los porcentajes del examen
+                deben sumar 100%.
 
             </div>
 
-        </div>
+        `;
+
+        return;
+
+    }
 
 
+    if (
+        porcentajePresentacion < 0 ||
+        porcentajeExamen < 0
+    ) {
 
-        <!-- =================================================
-             TARJETA FLOTANTE:
-             SUGERENCIAS
-        ================================================== -->
+        contenedor.innerHTML = `
 
-        <div
-            id="panel-sugerencias"
-            class="panel-menu oculto"
-            onclick="cerrarPanelDesdeFondo(event)"
-        >
+            <div class="mensaje-peligro">
 
-            <div class="panel-contenido">
-
-                <div class="panel-encabezado">
-
-                    <div>
-
-                        <h2>Sugerencias</h2>
-
-                        <p>
-                            Ayúdame a mejorar la calculadora.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        class="panel-cerrar"
-                        onclick="cerrarPanelMenu()"
-                        aria-label="Cerrar"
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-
-                <div class="panel-tarjeta">
-
-                    <label for="tipo-sugerencia">
-                        Tipo de sugerencia
-                    </label>
-
-                    <select id="tipo-sugerencia">
-
-                        <option value="">
-                            Selecciona una opción
-                        </option>
-
-                        <option value="funcion">
-                            Nueva función
-                        </option>
-
-                        <option value="diseño">
-                            Diseño
-                        </option>
-
-                        <option value="error">
-                            Reportar un error
-                        </option>
-
-                        <option value="otro">
-                            Otro
-                        </option>
-
-                    </select>
-
-
-                    <label for="ramo-sugerencia">
-                        Ramo
-                    </label>
-
-                    <input
-                        type="text"
-                        id="ramo-sugerencia"
-                        placeholder="Ej: Cálculo II"
-                    >
-
-
-                    <label for="mensaje-sugerencia">
-                        Mensaje
-                    </label>
-
-                    <textarea
-                        id="mensaje-sugerencia"
-                        placeholder="Cuéntanos tu sugerencia..."
-                    ></textarea>
-
-
-                    <button
-                        class="boton-principal"
-                        onclick="enviarSugerencia()"
-                    >
-                        Enviar sugerencia
-                    </button>
-
-                </div>
+                Los porcentajes no pueden
+                ser negativos.
 
             </div>
 
-        </div>
+        `;
+
+        return;
+
+    }
 
 
+    if (
+        presentacion === null
+    ) {
 
-        <!-- =================================================
-             TARJETA FLOTANTE:
-             TEMAS
-        ================================================== -->
+        contenedor.innerHTML =
+            "Aún no hay una nota de presentación disponible.";
 
-        <div
-            id="panel-temas"
-            class="panel-menu oculto"
-            onclick="cerrarPanelDesdeFondo(event)"
-        >
+        return;
 
-            <div class="panel-contenido">
-
-                <div class="panel-encabezado">
-
-                    <div>
-
-                        <h2>Temas</h2>
-
-                        <p>
-                            Personaliza los colores de la calculadora.
-                        </p>
-
-                    </div>
+    }
 
 
-                    <button
-                        class="panel-cerrar"
-                        onclick="cerrarPanelMenu()"
-                        aria-label="Cerrar"
-                    >
-                        ×
-                    </button>
-
-                </div>
+    const minimo =
+        Number(
+            ramo.notaMinima
+        );
 
 
-                <div class="panel-tarjeta">
-
-                    <h3>Elige un tema</h3>
-
-
-                    <div class="temas">
-
-                        <button
-                            class="tema-opcion"
-                            onclick="cambiarTema('lila')"
-                        >
-
-                            <span class="tema-color lila"></span>
-
-                            Lila
-
-                        </button>
+    const necesario =
+        (
+            minimo -
+            (
+                presentacion *
+                (
+                    porcentajePresentacion /
+                    100
+                )
+            )
+        ) /
+        (
+            porcentajeExamen /
+            100
+        );
 
 
-                        <button
-                            class="tema-opcion"
-                            onclick="cambiarTema('verde')"
-                        >
+    if (
+        necesario <= 1
+    ) {
 
-                            <span class="tema-color verde"></span>
+        contenedor.innerHTML = `
 
-                            Verde
+            <div class="mensaje-exito">
 
-                        </button>
-
-
-                        <button
-                            class="tema-opcion"
-                            onclick="cambiarTema('celeste')"
-                        >
-
-                            <span class="tema-color celeste"></span>
-
-                            Celeste
-
-                        </button>
-
-
-                        <button
-                            class="tema-opcion"
-                            onclick="cambiarTema('rosa')"
-                        >
-
-                            <span class="tema-color rosa"></span>
-
-                            Rosa
-
-                        </button>
-
-                    </div>
-
-                </div>
+                Ya alcanzas el promedio mínimo
+                sin considerar el examen.
 
             </div>
 
-        </div>
+        `;
 
+    } else if (
+        necesario > 7
+    ) {
 
+        contenedor.innerHTML = `
 
-        <!-- =================================================
-             TARJETA FLOTANTE:
-             VERSIÓN
-        ================================================== -->
+            <div class="mensaje-advertencia">
 
-        <div
-            id="panel-version"
-            class="panel-menu oculto"
-            onclick="cerrarPanelDesdeFondo(event)"
-        >
-
-            <div class="panel-contenido">
-
-                <div class="panel-encabezado">
-
-                    <div>
-
-                        <h2>Versión</h2>
-
-                        <p>
-                            Historial de cambios de la calculadora.
-                        </p>
-
-                    </div>
-
-
-                    <button
-                        class="panel-cerrar"
-                        onclick="cerrarPanelMenu()"
-                        aria-label="Cerrar"
-                    >
-                        ×
-                    </button>
-
-                </div>
-
-
-                <div class="historial-versiones">
-
-                    <div class="version-item actual">
-
-                        <div class="version-numero">
-                            v1.0
-                        </div>
-
-                        <div class="version-info">
-
-                            <h3>
-                                Versión actual
-                            </h3>
-
-                            <p>
-                                Primera versión de la calculadora
-                                de promedios.
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!--
-                    AQUÍ SE PUEDEN AGREGAR FUTURAS VERSIONES.
-                    -->
-
-                </div>
+                Incluso con una nota 7,0 en el examen
+                no alcanzarías el promedio mínimo.
 
             </div>
 
-        </div>
+        `;
+
+    } else {
+
+        contenedor.innerHTML = `
+
+            Para terminar con
+            <strong>
+                ${formatearNumero(
+                    minimo
+                )}
+            </strong>,
+
+            necesitas aproximadamente
+            <strong>
+                ${formatearNumero(
+                    necesario
+                )}
+            </strong>
+
+            en el examen.
+
+        `;
+
+    }
 
 
-    </main>
+    ramo.porcentajePresentacion =
+        porcentajePresentacion;
 
 
-
-    <!-- =====================================================
-         WATERMARK
-    ====================================================== -->
-
-    <div class="watermark">
-        © Calculadora creada por @Mo0nbupp
-    </div>
+    ramo.porcentajeExamen =
+        porcentajeExamen;
 
 
+    guardarDatos();
 
-    <!-- =====================================================
-         JAVASCRIPT
-    ====================================================== -->
+}
 
-    <script src="script.js"></script>
 
-</body>
+/* =========================================================
+   EDITAR RAMO
+========================================================= */
 
-</html>
+function editarRamo() {
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (!ramo) return;
+
+
+    modoEdicion =
+        true;
+
+
+    document.getElementById(
+        "nombre-nuevo-ramo"
+    ).value =
+        ramo.nombre;
+
+
+    document.getElementById(
+        "nota-minima"
+    ).value =
+        ramo.notaMinima;
+
+
+    if (
+        ramo.tieneLaboratorio
+    ) {
+
+        document.getElementById(
+            "porcentaje-teoria"
+        ).value =
+            ramo.porcentajeTeoria;
+
+
+        document.getElementById(
+            "porcentaje-laboratorio"
+        ).value =
+            ramo.porcentajeLaboratorio;
+
+    }
+
+
+    /*
+        Vamos directamente a evaluaciones.
+        El nombre se puede modificar desde
+        la pantalla de nuevo ramo.
+    */
+
+    prepararPantallaEvaluaciones();
+
+
+    mostrarPantalla(
+        "pantalla-evaluaciones"
+    );
+
+}
+
+
+/* =========================================================
+   GUARDAR CONFIGURACIÓN
+========================================================= */
+
+function guardarConfiguracion() {
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (!ramo) return;
+
+
+    const notaMinima =
+        Number(
+            document.getElementById(
+                "nota-minima"
+            ).value
+        );
+
+
+    if (
+        isNaN(notaMinima) ||
+        notaMinima < 1 ||
+        notaMinima > 7
+    ) {
+
+        alert(
+            "Ingresa una nota mínima válida entre 1,0 y 7,0."
+        );
+
+        return;
+
+    }
+
+
+    ramo.notaMinima =
+        notaMinima;
+
+
+    guardarDatos();
+
+
+    renderizarResumenRamo();
+
+
+    mostrarPantalla(
+        "pantalla-ramo"
+    );
+
+}
+
+
+/* =========================================================
+   ELIMINAR RAMO
+========================================================= */
+
+function confirmarEliminarRamo() {
+
+    const confirmar =
+        confirm(
+            "¿Quieres eliminar este ramo?\n\nSe borrarán sus evaluaciones y notas guardadas."
+        );
+
+
+    if (!confirmar) return;
+
+
+    ramos =
+        ramos.filter(
+            ramo =>
+                ramo.id !==
+                ramoActualId
+        );
+
+
+    guardarDatos();
+
+
+    ramoActualId =
+        null;
+
+
+    renderizarRamos();
+
+
+    mostrarPantalla(
+        "pantalla-inicio"
+    );
+
+}
+
+
+/* =========================================================
+   NAVEGACIÓN
+========================================================= */
+
+function volverMisRamos() {
+
+    renderizarRamos();
+
+
+    mostrarPantalla(
+        "pantalla-inicio"
+    );
+
+}
+
+
+function volverAnteriorConfiguracion() {
+
+    const ramo =
+        obtenerRamoActual();
+
+
+    if (
+        ramo &&
+        ramo.tieneLaboratorio
+    ) {
+
+        mostrarPantalla(
+            "pantalla-division"
+        );
+
+    } else {
+
+        mostrarPantalla(
+            "pantalla-laboratorio"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   ESTADO DEL RAMO
+========================================================= */
+
+function obtenerEstadoRamo(
+    ramo
+) {
+
+    const promedio =
+        calcularPromedioRamo(
+            ramo
+        );
+
+
+    if (
+        promedio === null
+    ) {
+
+        return "Todavía no tienes notas ingresadas.";
+
+    }
+
+
+    const pendientes =
+        obtenerEvaluacionesPendientes(
+            ramo
+        );
+
+
+    if (
+        pendientes.length
+    ) {
+
+        return "Aún tienes evaluaciones pendientes.";
+
+    }
+
+
+    if (
+        promedio >=
+        ramo.notaMinima
+    ) {
+
+        return "¡Lo lograste!";
+
+    }
+
+
+    return "Esta vez no alcanzaste el objetivo.";
+
+}
+
+
+/* =========================================================
+   MENÚ LATERAL
+========================================================= */
+
+function abrirMenu() {
+
+    const menu =
+        document.getElementById(
+            "menu-lateral"
+        );
+
+
+    const fondo =
+        document.getElementById(
+            "fondo-menu"
+        );
+
+
+    if (menu) {
+
+        menu.classList.add(
+            "abierto"
+        );
+
+    }
+
+
+    if (fondo) {
+
+        fondo.classList.add(
+            "activo"
+        );
+
+    }
+
+}
+
+
+function cerrarMenu() {
+
+    const menu =
+        document.getElementById(
+            "menu-lateral"
+        );
+
+
+    const fondo =
+        document.getElementById(
+            "fondo-menu"
+        );
+
+
+    if (menu) {
+
+        menu.classList.remove(
+            "abierto"
+        );
+
+    }
+
+
+    if (fondo) {
+
+        fondo.classList.remove(
+            "activo"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   OPCIONES DEL MENÚ
+========================================================= */
+
+function irAMisRamos() {
+
+    cerrarMenu();
+
+    cerrarPanelMenu();
+
+    volverMisRamos();
+
+}
+
+
+function irComoFunciona() {
+
+    cerrarMenu();
+
+    abrirPanelMenu(
+        "panel-como-funciona"
+    );
+
+}
+
+
+function irSugerencias() {
+
+    cerrarMenu();
+
+    abrirPanelMenu(
+        "panel-sugerencias"
+    );
+
+}
+
+
+function irTemas() {
+
+    cerrarMenu();
+
+    abrirPanelMenu(
+        "panel-temas"
+    );
+
+}
+
+
+function irVersion() {
+
+    cerrarMenu();
+
+    abrirPanelMenu(
+        "panel-version"
+    );
+
+}
+
+
+/* =========================================================
+   PANELES DEL MENÚ
+========================================================= */
+
+function abrirPanelMenu(
+    idPanel
+) {
+
+    cerrarPanelMenu();
+
+
+    const panel =
+        document.getElementById(
+            idPanel
+        );
+
+
+    if (!panel) return;
+
+
+    panel.classList.remove(
+        "oculto"
+    );
+
+
+    document.body.classList.add(
+        "panel-abierto"
+    );
+
+}
+
+
+function cerrarPanelMenu() {
+
+    document
+        .querySelectorAll(
+            ".panel-menu"
+        )
+        .forEach(
+            panel => {
+
+                panel.classList.add(
+                    "oculto"
+                );
+
+            }
+        );
+
+
+    document.body.classList.remove(
+        "panel-abierto"
+    );
+
+}
+
+
+/*
+    Permite cerrar el panel haciendo clic
+    en el fondo, pero no cuando se hace
+    clic dentro del contenido.
+*/
+
+function cerrarPanelDesdeFondo(
+    evento
+) {
+
+    if (
+        evento.target ===
+        evento.currentTarget
+    ) {
+
+        cerrarPanelMenu();
+
+    }
+
+}
+
+
+/* =========================================================
+   TEMAS
+========================================================= */
+
+function cambiarTema(
+    tema
+) {
+
+    const temasPermitidos = [
+        "lila",
+        "verde",
+        "celeste",
+        "rosa"
+    ];
+
+
+    if (
+        !temasPermitidos.includes(
+            tema
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    document.body.dataset.tema =
+        tema;
+
+
+    localStorage.setItem(
+        "temaCalculadora",
+        tema
+    );
+
+}
+
+
+function cargarTema() {
+
+    const tema =
+        localStorage.getItem(
+            "temaCalculadora"
+        ) || "lila";
+
+
+    document.body.dataset.tema =
+        tema;
+
+}
+
+
+/* =========================================================
+   SUGERENCIAS
+========================================================= */
+
+function enviarSugerencia() {
+
+    const tipo =
+        document.getElementById(
+            "tipo-sugerencia"
+        ).value;
+
+
+    const ramo =
+        document.getElementById(
+            "ramo-sugerencia"
+        ).value.trim();
+
+
+    const mensaje =
+        document.getElementById(
+            "mensaje-sugerencia"
+        ).value.trim();
+
+
+    if (
+        !tipo ||
+        !mensaje
+    ) {
+
+        alert(
+            "Completa el tipo de sugerencia y el mensaje."
+        );
+
+        return;
+
+    }
+
+
+    /*
+        Actualmente las sugerencias
+        solamente muestran una confirmación.
+
+        Más adelante esta función se puede
+        conectar con Supabase.
+    */
+
+    console.log(
+        "Sugerencia:",
+        {
+            tipo,
+            ramo,
+            mensaje
+        }
+    );
+
+
+    alert(
+        "¡Gracias por tu sugerencia!"
+    );
+
+
+    document.getElementById(
+        "tipo-sugerencia"
+    ).value = "";
+
+
+    document.getElementById(
+        "ramo-sugerencia"
+    ).value = "";
+
+
+    document.getElementById(
+        "mensaje-sugerencia"
+    ).value = "";
+
+
+    cerrarPanelMenu();
+
+}
+
+
+/* =========================================================
+   TECLADO
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    evento => {
+
+        if (
+            evento.key !==
+            "Escape"
+        ) {
+
+            return;
+
+        }
+
+
+        /*
+            Si hay un modal abierto,
+            se cierra primero.
+        */
+
+        const modalEvaluacion =
+            document.getElementById(
+                "modal-evaluacion"
+            );
+
+
+        if (
+            modalEvaluacion &&
+            !modalEvaluacion.classList.contains(
+                "oculto"
+            )
+        ) {
+
+            cerrarModalEvaluacion();
+
+            return;
+
+        }
+
+
+        const modalSalir =
+            document.getElementById(
+                "modal-salir"
+            );
+
+
+        if (
+            modalSalir &&
+            !modalSalir.classList.contains(
+                "oculto"
+            )
+        ) {
+
+            cerrarModalSalir();
+
+            return;
+
+        }
+
+
+        /*
+            Después cerramos paneles.
+        */
+
+        const algunPanelAbierto =
+            document.querySelector(
+                ".panel-menu:not(.oculto)"
+            );
+
+
+        if (algunPanelAbierto) {
+
+            cerrarPanelMenu();
+
+            return;
+
+        }
+
+
+        /*
+            Finalmente cerramos el menú lateral.
+        */
+
+        cerrarMenu();
+
+    }
+);
+
+
+/* =========================================================
+   MODAL DE SALIDA
+========================================================= */
+
+function cerrarModalSalir() {
+
+    const modal =
+        document.getElementById(
+            "modal-salir"
+        );
+
+
+    if (!modal) return;
+
+
+    modal.classList.add(
+        "oculto"
+    );
+
+}
+
+
+function salirSinGuardar() {
+
+    cerrarModalSalir();
+
+    /*
+        Esta función queda preparada
+        para futuras ediciones más avanzadas.
+    */
+
+    mostrarPantalla(
+        "pantalla-ramo"
+    );
+
+}
+
+
+/* =========================================================
+   INICIO
+========================================================= */
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        cargarTema();
+
+        renderizarRamos();
+
+    }
+);
